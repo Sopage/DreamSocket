@@ -115,7 +115,6 @@ public class DramSocket implements Runnable {
         running = false;
         if (writeRunnable != null) {
             writeRunnable.stop();
-            writeRunnable = null;
         }
         if (socket != null) {
             shutdownInput(socket);
