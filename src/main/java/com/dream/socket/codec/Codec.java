@@ -3,7 +3,7 @@ package com.dream.socket.codec;
 import java.nio.ByteBuffer;
 
 /**
- * 编解码抽象类
+ * 编解码接口
  *
  * @param <D> 解码成的对象
  * @param <E> 要编码的对象
