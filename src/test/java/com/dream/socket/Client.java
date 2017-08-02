@@ -11,10 +11,18 @@ public class Client implements Codec<String, String>, Handle<String>{
 
     public static void main(String[] args) {
         Client client = new Client();
-        DramSocket socket = new DramSocket();
+        DramSocket socket = new DramSocket(false);
         socket.connect("127.0.0.1", 6969);
         socket.setCodec(client, client);
         socket.start();
+        new Thread(()->{
+            try {
+                Thread.sleep(10000);
+                socket.stop();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
         for(int i=1; i<=10; i++){
             socket.send("I am Client, The message index is " + i);
         }

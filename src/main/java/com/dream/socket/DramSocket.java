@@ -19,12 +19,19 @@ public class DramSocket implements Runnable {
     private ExecutorService pool;
     private Socket socket;
     private WriteRunnable writeRunnable;
+    private HandleRunnable handleRunnable;
     private Codec codec;
-    private Handle handle;
     private boolean running;
+    private boolean isReadBuffer;
 
     public DramSocket() {
         writeRunnable = new WriteRunnable();
+        handleRunnable = new HandleRunnable();
+    }
+
+    public DramSocket(boolean isReadBuffer){
+        this();
+        this.isReadBuffer = isReadBuffer;
     }
 
     public void connect(String host, int port) {
@@ -37,15 +44,15 @@ public class DramSocket implements Runnable {
 
     public <D, E> void setCodec(Codec<D, E> codec, Handle<D> handle) {
         this.codec = codec;
-        this.handle = handle;
         writeRunnable.setCodec(this.codec);
+        handleRunnable.setHandle(handle);
     }
 
     public void start() {
         if (codec == null) {
             throw new NullPointerException("请设置编解码器");
         }
-        if (handle == null) {
+        if (handleRunnable.handle == null) {
             throw new NullPointerException("请设置消息处理器");
         }
         if (address == null) {
@@ -60,7 +67,7 @@ public class DramSocket implements Runnable {
             }
             pool = null;
         }
-        pool = Executors.newFixedThreadPool(2);
+        pool = Executors.newFixedThreadPool(3);
         running = true;
         pool.execute(this);
     }
@@ -86,15 +93,20 @@ public class DramSocket implements Runnable {
                     if (socket.isConnected()) {
                         writeRunnable.setOutputStream(socket.getOutputStream());
                         pool.execute(writeRunnable);
-                        handle.onStatus(Handle.STATUS_CONNECTED);
-                        readByBuffer(socket, codec, handle);//阻塞方法
+                        handleRunnable.status(Handle.STATUS_CONNECTED);
+                        pool.execute(handleRunnable);
+                        if(isReadBuffer){
+                            readByBuffer(socket, codec, handleRunnable);
+                        }else{
+                            readByBytes(socket, codec, handleRunnable);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     try {
-                        handle.onStatus(Handle.STATUS_FAIL);
                         socket = null;
                         if (isRunning()) {
+                            handleRunnable.status(Handle.STATUS_FAIL);
                             this.wait(6000);
                         }
                     } catch (InterruptedException ie) {
@@ -116,13 +128,16 @@ public class DramSocket implements Runnable {
         if (writeRunnable != null) {
             writeRunnable.stop();
         }
+        if(handleRunnable != null){
+            handleRunnable.stop();
+        }
         if (socket != null) {
             shutdownInput(socket);
             shutdownOutput(socket);
             close(socket);
             socket = null;
-            if (handle != null) {
-                handle.onStatus(Handle.STATUS_DISCONNECT);
+            if (handleRunnable != null) {
+                handleRunnable.status(Handle.STATUS_DISCONNECT);
             }
         }
         if (pool != null && !pool.isShutdown()) {
@@ -131,7 +146,7 @@ public class DramSocket implements Runnable {
 
     }
 
-    private static <D, E> void readByBytes(Socket socket, Codec<D, E> codec, Handle handle) throws Exception {
+    private static <D, E> void readByBytes(Socket socket, Codec<D, E> codec, HandleRunnable<D> handle) throws Exception {
         //解码需要操作的buffer
         final ByteBuffer buffer = ByteBuffer.allocate(102400);
         //读取的缓冲区
@@ -169,7 +184,7 @@ public class DramSocket implements Runnable {
             while (buffer.hasRemaining() && ((data = codec.decode(buffer)) != null)) {
                 print("成功解码一条数据");
                 //把解码的数据回调给Handler
-                handle.onReceive(data);
+                handle.put(data);
                 //再次判断ByteBuffer后面是否还有可读数据
                 if (buffer.hasRemaining()) {
                     print("还有未解码数据");
@@ -213,7 +228,7 @@ public class DramSocket implements Runnable {
         }
     }
 
-    private static <D, E> void readByBuffer(Socket socket, Codec<D, E> codec, Handle handle) throws Exception {
+    private static <D, E> void readByBuffer(Socket socket, Codec<D, E> codec, HandleRunnable<D> handle) throws Exception {
         //解码需要操作的buffer
         final ByteBuffer buffer = ByteBuffer.allocate(102400);
         //缓存没有被解码的缓冲区
@@ -252,7 +267,7 @@ public class DramSocket implements Runnable {
             while (buffer.hasRemaining() && ((data = codec.decode(buffer)) != null)) {
                 print("成功解码一条数据");
                 //把解码的数据回调给Handler
-                handle.onReceive(data);
+                handle.put(data);
                 //再次判断ByteBuffer后面是否还有可读数据
                 if (buffer.hasRemaining()) {
                     print("还有未解码数据");
@@ -293,7 +308,7 @@ public class DramSocket implements Runnable {
         }
     }
 
-    public static final class WriteRunnable<D, E> implements Runnable {
+    private static final class WriteRunnable<D, E> implements Runnable {
         private Vector<E> vector = new Vector<>();
         private Codec<D, E> codec;
         private OutputStream out;
@@ -349,6 +364,60 @@ public class DramSocket implements Runnable {
 
         public void send(E data) {
             this.vector.add(data);
+            synchronized (this) {
+                this.notify();
+            }
+        }
+    }
+
+    private static final class HandleRunnable<D> implements Runnable {
+
+        private Vector<D> vector = new Vector<>();
+        private Handle<D> handle;
+        private boolean running;
+
+        private void setHandle(Handle<D> handle) {
+            this.handle = handle;
+        }
+
+        @Override
+        public void run() {
+            synchronized (this) {
+                running = true;
+                while (running) {
+                    if (vector.size() == 0) {
+                        try {
+                            this.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (vector.size() > 0) {
+                        D data = vector.remove(0);
+                        if (handle != null) {
+                            handle.onReceive(data);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void put(D d) {
+            vector.add(d);
+            synchronized (this) {
+                this.notify();
+            }
+        }
+
+        private void status(int status) {
+            if (handle != null) {
+                handle.onStatus(status);
+            }
+        }
+
+        private void stop() {
+            running = false;
             synchronized (this) {
                 this.notify();
             }
