@@ -4,6 +4,8 @@ import com.dream.socket.codec.Codec;
 import com.dream.socket.codec.Decode;
 import com.dream.socket.codec.Encode;
 import com.dream.socket.codec.Handle;
+import com.dream.socket.protobuf.Protobuf;
+import com.dream.socket.protocol.Protocol;
 
 import java.nio.ByteBuffer;
 
@@ -13,21 +15,27 @@ public class Client extends Codec<String, String> implements Handle<String>{
 
     public static void main(String[] args) {
         Client client = new Client();
-        DreamSocket socket = new DreamSocket(false);
+        DreamSocket socket = new DreamSocket(true);
         socket.setAddress("127.0.0.1", 6969);
         socket.setHandle(client);
         socket.setCodec(client);
         socket.start();
-        new Thread(()->{
+//        new Thread(()->{
+//            try {
+//                Thread.sleep(10000);
+//                socket.stop();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
+        for(int i=1; i<=10; i++){
             try {
-                Thread.sleep(10000);
-                socket.stop();
+                socket.send("I am Client, The message index is " + i);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }).start();
-        for(int i=1; i<=10; i++){
-            socket.send("I am Client, The message index is " + i);
+
         }
     }
 
@@ -36,17 +44,22 @@ public class Client extends Codec<String, String> implements Handle<String>{
         return new Decode<String>() {
             @Override
             public String decode(ByteBuffer buffer) {
-                if(buffer.limit() < 5){
+                if(buffer.limit() < Protocol.HEADER_LENGTH){
                     return null;
                 }
-                char c = (char) buffer.get();
-                int len = buffer.getInt();
-                if(buffer.remaining() >= len){
-                    buffer.get(Client.this.buffer, 0, len);
-                    System.out.println("decode: start=" + String.valueOf(c)+ " len=" + len);
-                    return new String(Client.this.buffer, 0, len);
+                char start = (char)buffer.get();
+                byte version = buffer.get();
+                int length = buffer.getInt();
+                buffer.get(Protocol.RETAIN);
+                char xy = (char)buffer.get();
+                if(buffer.remaining() < length){
+                    return null;
                 }
-                return null;
+                byte[] bytes = new byte[length - Protocol.HEADER_LENGTH];
+                buffer.get(bytes);
+                char end = (char)buffer.get();
+                System.out.println(new String(bytes));
+                return new String(bytes);
             }
         };
     }
@@ -56,7 +69,21 @@ public class Client extends Codec<String, String> implements Handle<String>{
         return new Encode<String>() {
             @Override
             public void encode(String data, ByteBuffer buffer) {
-                buffer.put(data.getBytes());
+                Protobuf.Text text = Protobuf.Text.newBuilder().setText(data).build();
+                Protobuf.Message.Builder builder = Protobuf.Message.newBuilder();
+                builder.setId(String.valueOf(System.currentTimeMillis()));
+                builder.setType(1);
+                builder.setSender(666666);
+                builder.setContent(text.getTextBytes());
+                Protobuf.Message message = builder.build();
+                byte[] array = message.toByteArray();
+                buffer.put(Protocol.START_TAG);
+                buffer.put(Protocol.VERSION);
+                buffer.putInt(array.length + Protocol.HEADER_LENGTH);
+                buffer.put(Protocol.RETAIN);
+                buffer.put(Protocol.VERIFY_TAG);
+                buffer.put(array);
+                buffer.put(Protocol.END_TAG);
             }
         };
     }
@@ -68,6 +95,6 @@ public class Client extends Codec<String, String> implements Handle<String>{
 
     @Override
     public void onReceive(String data) {
-        System.out.println("onReceive: " + data);
+//        System.out.println("onReceive: " + data);
     }
 }
