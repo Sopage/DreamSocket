@@ -16,6 +16,8 @@ import java.util.concurrent.Executors;
 
 public class DramSocket implements Runnable {
     private InetSocketAddress address;
+    private String host;
+    private int port;
     private ExecutorService pool;
     private Socket socket;
     private WriteRunnable writeRunnable;
@@ -35,11 +37,9 @@ public class DramSocket implements Runnable {
     }
 
     public void connect(String host, int port) {
-        this.address = new InetSocketAddress(host, port);
-    }
-
-    public void connect(InetSocketAddress address) {
-        this.address = address;
+        this.host = host;
+        this.port = port;
+        this.address = null;
     }
 
     public <D, E> void setCodec(Codec<D, E> codec, Handle<D> handle) {
@@ -88,6 +88,9 @@ public class DramSocket implements Runnable {
         synchronized (this) {
             while (isRunning()) {
                 try {
+                    if(address == null){
+                        address = new InetSocketAddress(host, port);
+                    }
                     socket = new Socket();
                     socket.connect(address);
                     if (socket.isConnected()) {
@@ -102,15 +105,16 @@ public class DramSocket implements Runnable {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    printError("连接失败");
                     try {
                         socket = null;
                         if (isRunning()) {
                             handleRunnable.status(Handle.STATUS_FAIL);
+                            printError("6秒后尝试重连");
                             this.wait(6000);
                         }
                     } catch (InterruptedException ie) {
-                        ie.printStackTrace();
+                        printError("重连发生异常");
                     }
                 }
             }
@@ -466,5 +470,9 @@ public class DramSocket implements Runnable {
 
     private static void print(String text) {
         System.out.println(text);
+    }
+
+    private static void printError(String text){
+        System.err.println(text);
     }
 }
