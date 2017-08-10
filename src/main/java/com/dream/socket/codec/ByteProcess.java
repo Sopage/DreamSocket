@@ -1,0 +1,32 @@
+package com.dream.socket.codec;
+
+import com.dream.socket.HandleRunnable;
+
+public abstract class ByteProcess {
+
+    protected Codec codec;
+
+    protected HandleRunnable handle;
+
+    public void setCodec(Codec codec) {
+        this.codec = codec;
+    }
+
+    public void setHandle(HandleRunnable handle) {
+        this.handle = handle;
+    }
+
+    protected abstract void decode();
+
+    public abstract boolean put(byte[] bytes, int length);
+
+    public abstract boolean put(byte[] bytes, int offset, int length);
+
+    public boolean codecIsNull(){
+        return codec == null;
+    }
+
+    protected void print(String text) {
+        System.out.println(text);
+    }
+}
