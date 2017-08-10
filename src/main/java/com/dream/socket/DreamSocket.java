@@ -14,7 +14,7 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DramSocket implements Runnable {
+public class DreamSocket implements Runnable {
     private InetSocketAddress address;
     private String host;
     private int port;
@@ -26,12 +26,12 @@ public class DramSocket implements Runnable {
     private boolean running;
     private boolean isReadBuffer;
 
-    public DramSocket() {
+    public DreamSocket() {
         writeRunnable = new WriteRunnable();
         handleRunnable = new HandleRunnable();
     }
 
-    public DramSocket(boolean isReadBuffer){
+    public DreamSocket(boolean isReadBuffer){
         this();
         this.isReadBuffer = isReadBuffer;
     }

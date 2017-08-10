@@ -11,7 +11,7 @@ public class Client implements Codec<String, String>, Handle<String>{
 
     public static void main(String[] args) {
         Client client = new Client();
-        DramSocket socket = new DramSocket(false);
+        DreamSocket socket = new DreamSocket(false);
         socket.connect("127.0.0.1", 6969);
         socket.setCodec(client, client);
         socket.start();
