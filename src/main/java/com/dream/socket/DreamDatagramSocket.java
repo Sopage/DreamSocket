@@ -2,6 +2,7 @@ package com.dream.socket;
 
 import com.dream.socket.codec.*;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -29,7 +30,7 @@ public class DreamDatagramSocket implements Runnable {
         this.isReadBuffer = isReadBuffer;
     }
 
-    public void connect(String host, int port) {
+    public void setAddress(String host, int port) {
         this.host = host;
         this.port = port;
         this.address = null;
@@ -78,6 +79,7 @@ public class DreamDatagramSocket implements Runnable {
     public void run() {
         synchronized (this) {
             try {
+                address = new InetSocketAddress(host, port);
                 socket = new DatagramSocket();
                 pool.execute(handleRunnable);
                 final byte[] bytes = new byte[102400];
@@ -91,6 +93,15 @@ public class DreamDatagramSocket implements Runnable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void send(String data) {
+        byte[] buffer = data.getBytes();
+        try {
+            socket.send(new DatagramPacket(buffer, 0, buffer.length, address));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
