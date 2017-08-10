@@ -5,7 +5,7 @@ public class Protocol {
     //{起始标记   -byte     -1}
     //{协议版本   -byte     -1}
     //{包总长度   -int      -4}
-    //{包头保留   -byte[26] -24}
+    //{包头保留   -byte[24] -24}
     //{包头校验   -byte     -1}
     //{包体内容   -byte[n]  -n}
     //{结束标记   -byte     -1}

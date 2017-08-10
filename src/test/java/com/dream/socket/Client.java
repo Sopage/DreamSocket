@@ -15,7 +15,7 @@ public class Client extends Codec<String, String> implements Handle<String>{
 
     public static void main(String[] args) {
         Client client = new Client();
-        DreamSocket socket = new DreamSocket(true);
+        DreamSocket socket = new DreamSocket(false);
         socket.setAddress("127.0.0.1", 6969);
         socket.setHandle(client);
         socket.setCodec(client);
@@ -28,10 +28,10 @@ public class Client extends Codec<String, String> implements Handle<String>{
 //                e.printStackTrace();
 //            }
 //        }).start();
-        for(int i=1; i<=10; i++){
+        for(int i=1; i<11; i++){
             try {
-                socket.send("I am Client, The message index is " + i);
                 Thread.sleep(500);
+                socket.send("I am Client, The message index is " + i);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -44,15 +44,16 @@ public class Client extends Codec<String, String> implements Handle<String>{
         return new Decode<String>() {
             @Override
             public String decode(ByteBuffer buffer) {
-                if(buffer.limit() < Protocol.HEADER_LENGTH){
+                int limit = buffer.limit();
+                if(limit < Protocol.HEADER_LENGTH){
                     return null;
                 }
                 char start = (char)buffer.get();
                 byte version = buffer.get();
-                int length = buffer.getInt();
+                int length = buffer.getInt();//包的总长度 包括头
                 buffer.get(Protocol.RETAIN);
                 char xy = (char)buffer.get();
-                if(buffer.remaining() < length){
+                if(limit < length){
                     return null;
                 }
                 byte[] bytes = new byte[length - Protocol.HEADER_LENGTH];

@@ -30,7 +30,7 @@ public class DreamSocket implements Runnable {
         handleRunnable = new HandleRunnable();
     }
 
-    public DreamSocket(boolean isReadBuffer){
+    public DreamSocket(boolean isReadBuffer) {
         this();
         this.isReadBuffer = isReadBuffer;
     }
@@ -41,15 +41,15 @@ public class DreamSocket implements Runnable {
         this.address = null;
     }
 
-    public void setHandle(Handle handle){
+    public void setHandle(Handle handle) {
         handleRunnable.setHandle(handle);
     }
 
     public void setCodec(Codec codec) {
         writeRunnable.setCodec(codec);
-        if(isReadBuffer){
+        if (isReadBuffer) {
             process = new ByteBufferProcess();
-        }else{
+        } else {
             process = new ByteArrayProcess();
         }
         process.setCodec(codec);
@@ -93,7 +93,7 @@ public class DreamSocket implements Runnable {
         synchronized (this) {
             while (isRunning()) {
                 try {
-                    if(address == null){
+                    if (address == null) {
                         address = new InetSocketAddress(host, port);
                     }
                     socket = new Socket();
@@ -139,7 +139,7 @@ public class DreamSocket implements Runnable {
         if (writeRunnable != null) {
             writeRunnable.stop();
         }
-        if(handleRunnable != null){
+        if (handleRunnable != null) {
             handleRunnable.stop();
         }
         if (socket != null) {
@@ -193,6 +193,7 @@ public class DreamSocket implements Runnable {
                         buffer.flip();
                         if (out != null) {
                             try {
+                                System.out.println("----->   " + data);
                                 out.write(buffer.array(), 0, buffer.limit());
                                 out.flush();
                             } catch (Exception e) {
@@ -261,7 +262,7 @@ public class DreamSocket implements Runnable {
         }
     }
 
-    private static void printError(String text){
+    private static void printError(String text) {
         System.err.println(text);
     }
 }
