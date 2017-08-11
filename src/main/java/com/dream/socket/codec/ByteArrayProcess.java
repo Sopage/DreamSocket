@@ -98,11 +98,6 @@ public class ByteArrayProcess extends ByteProcess {
     }
 
     @Override
-    public boolean put(byte[] bytes, int length) {
-        return this.put(bytes, 0, length);
-    }
-
-    @Override
     public boolean put(byte[] bytes, int offset, int length) {
         if (appendCache(bytes, offset, length)) {
             decode();

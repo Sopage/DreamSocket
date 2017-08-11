@@ -20,8 +20,6 @@ public abstract class ByteProcess {
 
     protected abstract void decode();
 
-    public abstract boolean put(byte[] bytes, int length);
-
     public abstract boolean put(byte[] bytes, int offset, int length);
 
     public boolean codecIsNull(){
