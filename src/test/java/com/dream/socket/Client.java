@@ -9,7 +9,7 @@ import com.dream.socket.protocol.Protocol;
 
 import java.nio.ByteBuffer;
 
-public class Client extends Codec<String, String> implements Handle<String>{
+public class Client extends Codec<String, String> implements Handle<String> {
 
     private byte[] buffer = new byte[102400];
 
@@ -21,15 +21,7 @@ public class Client extends Codec<String, String> implements Handle<String>{
         socket.setHandle(client);
         socket.setCodec(client);
         socket.start();
-//        new Thread(()->{
-//            try {
-//                Thread.sleep(10000);
-//                socket.stop();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
-        for(int i=1; i<11; i++){
+        for (int i = 1; i < 11; i++) {
             try {
                 Thread.sleep(500);
                 socket.send("I am Client, The message index is " + i);
@@ -46,20 +38,20 @@ public class Client extends Codec<String, String> implements Handle<String>{
             @Override
             public String decode(ByteBuffer buffer) {
                 int limit = buffer.limit();
-                if(limit < Protocol.HEADER_LENGTH){
+                if (limit < Protocol.HEADER_LENGTH) {
                     return null;
                 }
-                char start = (char)buffer.get();
+                char start = (char) buffer.get();
                 byte version = buffer.get();
                 int length = buffer.getInt();//包的总长度 包括头
                 buffer.get(Protocol.RETAIN);
-                char xy = (char)buffer.get();
-                if(limit < length){
+                char xy = (char) buffer.get();
+                if (limit < length) {
                     return null;
                 }
                 byte[] bytes = new byte[length - Protocol.HEADER_LENGTH];
                 buffer.get(bytes);
-                char end = (char)buffer.get();
+                char end = (char) buffer.get();
                 System.out.println(new String(bytes));
                 return new String(bytes);
             }
