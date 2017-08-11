@@ -34,6 +34,6 @@ public interface Handle<D> {
      * 请在这里做业务相关的处理，建议单独开个线程处理
      * @param data 消息
      */
-    void onReceive(D data);
+    void onMessage(D data);
 
 }

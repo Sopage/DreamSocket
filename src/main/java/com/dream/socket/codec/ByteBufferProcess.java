@@ -1,7 +1,5 @@
 package com.dream.socket.codec;
 
-import com.dream.socket.HandleRunnable;
-
 import java.nio.ByteBuffer;
 
 public class ByteBufferProcess extends ByteProcess {
@@ -13,12 +11,13 @@ public class ByteBufferProcess extends ByteProcess {
     //缓存没有被解码的缓冲区
     private final ByteBuffer cache = ByteBuffer.allocate(CACHE_BUFFER_LENGTH);
 
-    public ByteBufferProcess(){
+    public ByteBufferProcess() {
         //计算cache buffer数据相关信息
         cache.flip();
     }
 
-    private boolean appendCache(byte[] bytes, int offset, int length){
+    @Override
+    protected boolean appendCache(byte[] bytes, int offset, int length) {
         print("接收到数据, 上次遗留数据长度: cacheLength=" + cache.limit() + "  接收的数据长度:  readLength=" + length);
         //把position下标设置到最后面用户继续往后拼接数据
         if (cache.limit() + length > cache.capacity()) {
@@ -37,7 +36,7 @@ public class ByteBufferProcess extends ByteProcess {
     }
 
     @Override
-    protected void decode(){
+    protected void decode() {
         //把缓存重新加入到buffer中进行解码
         buffer.put(cache.array(), cache.position(), cache.limit());
         //计算buffer数据相关信息
@@ -90,13 +89,13 @@ public class ByteBufferProcess extends ByteProcess {
     }
 
     @Override
-    public boolean put(byte[] bytes, int length){
+    public boolean put(byte[] bytes, int length) {
         return this.put(bytes, 0, length);
     }
 
     @Override
-    public boolean put(byte[] bytes, int offset, int length){
-        if(appendCache(bytes, offset, length)){
+    public boolean put(byte[] bytes, int offset, int length) {
+        if (appendCache(bytes, offset, length)) {
             decode();
             return true;
         }

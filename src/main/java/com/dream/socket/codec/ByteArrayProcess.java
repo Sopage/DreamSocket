@@ -25,7 +25,8 @@ public class ByteArrayProcess extends ByteProcess {
      */
     private int cacheLength = 0;
 
-    private boolean appendCache(byte[] bytes, int offset, int length) {
+    @Override
+    protected boolean appendCache(byte[] bytes, int offset, int length) {
         if (cacheLength + length > cache.length) {
             //TODO 缓存区已满，丢弃读取的数据
             return false;

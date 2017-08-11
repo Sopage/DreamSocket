@@ -15,7 +15,8 @@ public class Client extends Codec<String, String> implements Handle<String>{
 
     public static void main(String[] args) {
         Client client = new Client();
-        DreamSocket socket = new DreamSocket(false);
+        DreamSocket socket = new DreamSocket();
+//        socket.isReadBuffer(true);
         socket.setAddress("127.0.0.1", 6969);
         socket.setHandle(client);
         socket.setCodec(client);
@@ -95,7 +96,7 @@ public class Client extends Codec<String, String> implements Handle<String>{
     }
 
     @Override
-    public void onReceive(String data) {
-//        System.out.println("onReceive: " + data);
+    public void onMessage(String data) {
+        System.out.println("onMessage: " + data);
     }
 }

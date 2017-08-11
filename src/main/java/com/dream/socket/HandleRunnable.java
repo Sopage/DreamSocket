@@ -30,7 +30,7 @@ public class HandleRunnable implements Runnable {
                 while (vector.size() > 0) {
                     Object data = vector.remove(0);
                     if (handle != null) {
-                        handle.onReceive(data);
+                        handle.onMessage(data);
                     }
                 }
             }

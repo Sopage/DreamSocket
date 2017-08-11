@@ -16,6 +16,8 @@ public abstract class ByteProcess {
         this.handle = handle;
     }
 
+    protected abstract boolean appendCache(byte[] bytes, int offset, int length);
+
     protected abstract void decode();
 
     public abstract boolean put(byte[] bytes, int length);

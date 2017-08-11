@@ -13,7 +13,7 @@ public class UDPClient extends Codec<String, String> implements Handle<String> {
     public static void main(String[] args) {
         UDPClient client = new UDPClient();
         DreamDatagramSocket socket = new DreamDatagramSocket();
-        socket.setAddress("127.0.0.1", 6969);
+        socket.setSendAddress("127.0.0.1", 6969);
         socket.setCodec(client);
         socket.setHandle(client);
         socket.start();
@@ -55,7 +55,12 @@ public class UDPClient extends Codec<String, String> implements Handle<String> {
 
     @Override
     public Encode<String> getEncode() {
-        return null;
+        return new Encode<String>() {
+            @Override
+            public void encode(String data, ByteBuffer buffer) {
+                buffer.put(data.getBytes());
+            }
+        };
     }
 
     @Override
@@ -64,7 +69,7 @@ public class UDPClient extends Codec<String, String> implements Handle<String> {
     }
 
     @Override
-    public void onReceive(String data) {
+    public void onMessage(String data) {
 
     }
 }
