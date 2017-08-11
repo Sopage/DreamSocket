@@ -22,11 +22,13 @@ public abstract class ByteProcess {
 
     public abstract boolean put(byte[] bytes, int offset, int length);
 
+    public abstract void reset();
+
     public boolean codecIsNull(){
         return codec == null;
     }
 
     protected void print(String text) {
-        System.out.println(text);
+//        System.out.println(text);
     }
 }

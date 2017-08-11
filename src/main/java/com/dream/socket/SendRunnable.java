@@ -47,6 +47,9 @@ public abstract class SendRunnable implements Runnable {
     }
 
     public void send(Object data) {
+        if (!sending) {
+            return;
+        }
         this.vector.add(data);
         synchronized (this) {
             this.notify();

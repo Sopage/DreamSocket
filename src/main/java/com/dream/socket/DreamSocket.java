@@ -47,8 +47,7 @@ public class DreamSocket extends DreamNetwork {
                     socket.connect(address);
                     if (socket.isConnected()) {
                         send.setOutputStream(socket.getOutputStream());
-                        this.startSend();
-                        this.startHandler();
+                        this.startSendAndHandler();
                         this.status(Handle.STATUS_CONNECTED);
                         byte[] bytes = new byte[102400];
                         InputStream in = socket.getInputStream();
@@ -60,7 +59,9 @@ public class DreamSocket extends DreamNetwork {
                 } catch (Exception e) {
                     e.printStackTrace();
                     printError("连接错误");
+                } finally {
                     try {
+                        this.stopSendAndHandler();
                         socket = null;
                         if (isRunning()) {
                             this.status(Handle.STATUS_FAIL);
@@ -114,9 +115,5 @@ public class DreamSocket extends DreamNetwork {
                 e.printStackTrace();
             }
         }
-    }
-
-    private static void printError(String text) {
-        System.err.println(text);
     }
 }

@@ -96,7 +96,7 @@ public class ByteArrayProcess extends ByteProcess {
     }
 
     @Override
-    public boolean put(byte[] bytes, int offset, int length) {
+    public synchronized boolean put(byte[] bytes, int offset, int length) {
         if (appendCache(bytes, offset, length)) {
             decode();
             return true;
@@ -104,5 +104,8 @@ public class ByteArrayProcess extends ByteProcess {
         return false;
     }
 
-
+    @Override
+    public void reset() {
+        cacheLength = 0;
+    }
 }

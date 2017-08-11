@@ -18,7 +18,7 @@ public abstract class DreamNetwork implements Runnable {
         handle = new HandleRunnable();
     }
 
-    public void isReadBuffer(boolean isReadBuffer){
+    public void isReadBuffer(boolean isReadBuffer) {
         this.isReadBuffer = isReadBuffer;
     }
 
@@ -27,7 +27,7 @@ public abstract class DreamNetwork implements Runnable {
     }
 
     public void setCodec(Codec codec) {
-        if(sendRunnable == null){
+        if (sendRunnable == null) {
             sendRunnable = getSendRunnable();
         }
         sendRunnable.setCodec(codec);
@@ -40,10 +40,11 @@ public abstract class DreamNetwork implements Runnable {
         process.setHandle(handle);
     }
 
-    public void start() {
+    public final void start() {
         if (process.codecIsNull()) {
             throw new NullPointerException("请设置编解码器");
         }
+        process.reset();
         if (handle.handleIsNull()) {
             throw new NullPointerException("请设置消息处理器");
         }
@@ -61,14 +62,9 @@ public abstract class DreamNetwork implements Runnable {
         pool.execute(this);
     }
 
-    public void stop(){
+    public final void stop() {
         running = false;
-        if (sendRunnable != null) {
-            sendRunnable.stop();
-        }
-        if (handle != null) {
-            handle.stop();
-        }
+        stopSendAndHandler();
         doStop();
         if (pool != null && !pool.isShutdown()) {
             pool.shutdown();
@@ -92,27 +88,38 @@ public abstract class DreamNetwork implements Runnable {
         return this.running;
     }
 
-    protected void decode(byte[] bytes, int offset, int length){
+    protected void decode(byte[] bytes, int offset, int length) {
         this.process.put(bytes, offset, length);
     }
 
-    public void send(Object data){
-        if(sendRunnable != null){
+    public void send(Object data) {
+        if (sendRunnable != null) {
             sendRunnable.send(data);
         }
     }
 
-    protected void startHandler(){
+    protected void startSendAndHandler() {
+        this.process.reset();
+        this.pool.execute(sendRunnable);
         this.pool.execute(handle);
     }
 
-    protected void startSend(){
-        this.pool.execute(sendRunnable);
+    protected void stopSendAndHandler() {
+        if (sendRunnable != null) {
+            sendRunnable.stop();
+        }
+        if (handle != null) {
+            handle.stop();
+        }
     }
 
-    protected void status(int status){
-        if(this.handle != null){
+    protected void status(int status) {
+        if (this.handle != null) {
             this.handle.status(status);
         }
+    }
+
+    protected void printError(String text) {
+        System.err.println(text);
     }
 }

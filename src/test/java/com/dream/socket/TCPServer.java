@@ -47,7 +47,7 @@ public class TCPServer {
                 DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
                 String text = "Hi, I am is Server, The message index is %d";
                 ByteBuffer byteBuffer = ByteBuffer.allocate(102400);
-                for (int i = 1; i <= 100; i++) {
+                for (int i = 1; i <= 1000; i++) {
                     byte[] body = String.format(text, i).getBytes();
                     byteBuffer.clear();
 
@@ -57,25 +57,25 @@ public class TCPServer {
                     byteBuffer.flip();
                     dos.write(byteBuffer.array(), 0, byteBuffer.limit());
                     dos.flush();
-                    Thread.sleep(1000);
+//                    Thread.sleep(1000);
 
                     byteBuffer.clear();
                     byteBuffer.put(Protocol.RETAIN);
                     byteBuffer.flip();
                     dos.write(byteBuffer.array(), 0, byteBuffer.limit());
                     dos.flush();
-                    Thread.sleep(1000);
+//                    Thread.sleep(1000);
 
                     byteBuffer.clear();
                     byteBuffer.put(Protocol.VERIFY_TAG);
                     byteBuffer.flip();
                     dos.write(byteBuffer.array(), 0, byteBuffer.limit());
                     dos.flush();
-                    Thread.sleep(1000);
+//                    Thread.sleep(1000);
 
                     dos.write(body);
                     dos.flush();
-                    Thread.sleep(1000);
+//                    Thread.sleep(1000);
 
                     byteBuffer.clear();
                     byteBuffer.put(Protocol.END_TAG);

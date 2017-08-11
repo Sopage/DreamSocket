@@ -16,7 +16,7 @@ public class DreamDatagramSocket extends DreamNetwork {
 
     @Override
     protected void doStop() {
-        if(socket != null){
+        if (socket != null) {
             socket.close();
             socket = null;
             this.status(Handle.STATUS_DISCONNECT);
@@ -34,8 +34,7 @@ public class DreamDatagramSocket extends DreamNetwork {
             try {
                 socket = new DatagramSocket();
                 send.setDatagramSocket(socket);
-                startHandler();
-                startSend();
+                this.startSendAndHandler();
                 final byte[] bytes = new byte[102400];
                 DatagramPacket packet;
                 while (isRunning()) {
@@ -45,6 +44,24 @@ public class DreamDatagramSocket extends DreamNetwork {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                printError("接收数据错误");
+            } finally {
+                try {
+                    socket.disconnect();
+                    socket.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                socket = null;
+                this.stopSendAndHandler();
+                if (isRunning()) {
+                    this.status(Handle.STATUS_FAIL);
+                    try {
+                        this.wait(6000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

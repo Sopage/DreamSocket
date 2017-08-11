@@ -16,16 +16,23 @@ public class Client extends Codec<String, String> implements Handle<String> {
     public static void main(String[] args) {
         Client client = new Client();
         DreamSocket socket = new DreamSocket();
-        socket.isReadBuffer(false);
+        socket.isReadBuffer(true);
         socket.setAddress("127.0.0.1", 6969);
         socket.setHandle(client);
         socket.setCodec(client);
         socket.start();
-        for (int i = 1; i < 11; i++) {
+        new Thread(()->{
             try {
-                Thread.sleep(500);
-                socket.send("I am Client, The message index is " + i);
+                Thread.sleep(20000);
             } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            socket.stop();
+        }).start();
+        for (int i = 1; i < 1000; i++) {
+            try {
+                socket.send("I am Client, The message index is " + i);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
