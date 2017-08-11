@@ -18,7 +18,7 @@ public class ByteBufferProcess extends ByteProcess {
 
     @Override
     protected boolean appendCache(byte[] bytes, int offset, int length) {
-        print("接收到数据, 上次遗留数据长度: cacheLength=" + cache.limit() + "  接收的数据长度:  readLength=" + length);
+        print(String.format("1.收到数据-> 缓存{length=\"%d\"} 接收{length=\"%d\"}", cache.limit(), length));
         //把position下标设置到最后面用户继续往后拼接数据
         if (cache.limit() + length > cache.capacity()) {
             //TODO 缓存区已满，丢弃读取的数据
@@ -31,7 +31,7 @@ public class ByteBufferProcess extends ByteProcess {
         cache.put(bytes, 0, length);
         //计算cache buffer数据相关信息
         cache.flip();
-        print("拼接遗留数据和读取数据放入缓存, 长度: cacheLength=" + cache.limit());
+        print(String.format("2.合并数据-> 缓存{length=\"%d\"}", cache.limit()));
         return true;
     }
 
@@ -46,12 +46,11 @@ public class ByteBufferProcess extends ByteProcess {
         Object data;
         //判断如果ByteBuffer后面有可读数据并且解码一次
         while (buffer.hasRemaining() && ((data = codec.getDecode().decode(buffer)) != null)) {
-            print("成功解码一条数据");
+            print(String.format("3.成功解码-> Buffer{剩余=\"%d\"}", buffer.remaining()));
             //把解码的数据回调给Handler
             handle.put(data);
             //再次判断ByteBuffer后面是否还有可读数据
             if (buffer.hasRemaining()) {
-                print("还有未解码数据");
                 //清除重置cache ByteBuffer
                 cache.clear();
                 //把剩余buffer中的数据放置到缓存buffer中
@@ -72,7 +71,6 @@ public class ByteBufferProcess extends ByteProcess {
         buffer.reset();
         //判断是否还有数据可读
         if (buffer.hasRemaining()) {
-            print("退出解码，还有未解码数据");
             //清除重置cache ByteBuffer
             cache.clear();
             //把缓存重新加入到buffer中进行解码
@@ -85,7 +83,7 @@ public class ByteBufferProcess extends ByteProcess {
         cache.flip();
         //清除重置解码的ByteBuffer
         buffer.clear();
-        print("最后遗留数据长度: cacheLength=" + cache.limit() + " content: " + new String(cache.array(), 0, 100));
+        print(String.format("4.剩余数据-> 缓存{length=\"%d\"}", cache.limit()));
     }
 
     @Override

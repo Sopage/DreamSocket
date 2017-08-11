@@ -16,7 +16,7 @@ public class Client extends Codec<String, String> implements Handle<String> {
     public static void main(String[] args) {
         Client client = new Client();
         DreamSocket socket = new DreamSocket();
-//        socket.isReadBuffer(true);
+        socket.isReadBuffer(true);
         socket.setAddress("127.0.0.1", 6969);
         socket.setHandle(client);
         socket.setCodec(client);
@@ -52,7 +52,6 @@ public class Client extends Codec<String, String> implements Handle<String> {
                 byte[] bytes = new byte[length - Protocol.HEADER_LENGTH];
                 buffer.get(bytes);
                 char end = (char) buffer.get();
-                System.out.println(new String(bytes));
                 return new String(bytes);
             }
         };

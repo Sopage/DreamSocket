@@ -27,16 +27,16 @@ public class ByteArrayProcess extends ByteProcess {
 
     @Override
     protected boolean appendCache(byte[] bytes, int offset, int length) {
+        print(String.format("1.收到数据-> 缓存{length=\"%d\"} 接收{length=\"%d\"}", cacheLength, length));
         if (cacheLength + length > cache.length) {
             //TODO 缓存区已满，丢弃读取的数据
             return false;
         }
-        print("接收到数据, 上次遗留数据长度: cacheLength=" + cacheLength + "  接收的数据长度:  readLength=" + length);
         //把读取到的数据拷贝到上次缓存缓冲区的后面
         System.arraycopy(bytes, offset, cache, cacheLength, length);
         //缓存长度=上次的缓存长度+读取的数据长度
         cacheLength = cacheLength + length;
-        print("拼接遗留数据和读取数据放入缓存, 长度: cacheLength=" + cacheLength);
+        print(String.format("2.合并数据-> 缓存{length=\"%d\"}", cacheLength));
         return true;
     }
 
@@ -51,12 +51,11 @@ public class ByteArrayProcess extends ByteProcess {
         Object data;
         //判断如果ByteBuffer后面有可读数据并且解码一次
         while (buffer.hasRemaining() && ((data = codec.getDecode().decode(buffer)) != null)) {
-            print("成功解码一条数据");
+            print(String.format("3.成功解码-> Buffer{剩余=\"%d\"}", buffer.remaining()));
             //把解码的数据回调给Handler
             handle.put(data);
             //再次判断ByteBuffer后面是否还有可读数据
             if (buffer.hasRemaining()) {
-                print("还有未解码数据");
                 //ByteBuffer剩余没有读取的数据长度
                 int remaining = buffer.remaining();
                 //ByteBuffer当前读取的位置
@@ -80,7 +79,6 @@ public class ByteArrayProcess extends ByteProcess {
         buffer.reset();
         //判断是否还有数据可读
         if (buffer.hasRemaining()) {
-            print("退出解码，还有未解码数据");
             //剩余可读长度
             int remaining = buffer.remaining();
             //将剩余数据拷贝到缓存缓冲区
@@ -93,7 +91,7 @@ public class ByteArrayProcess extends ByteProcess {
         }
         //清除重置解码的ByteBuffer
         buffer.clear();
-        print("最后遗留数据长度: cacheLength=" + cacheLength + " content: " + new String(cache, 0, 100));
+        print(String.format("4.剩余数据-> 缓存{length=\"%d\"}", cacheLength));
 
     }
 
