@@ -111,15 +111,15 @@ public class Client2 extends Codec<Packet, Packet> implements Handle<Packet> {
             Protobuf.Body body = Protobuf.Body.parseFrom(data.body);
             switch (body.getType()) {
                 case Type.BODY_ACK:
-                    Protobuf.ACK ack = Protobuf.ACK.parseFrom(body.getContent());
-                    System.out.println("onMessage: type=ack id=" + ack.getId() + " message=" + ack.getMessage());
+                    System.out.println("onMessage: type=ack id=" + body.getId());
                     break;
                 case Type.BODY_MESSAGE:
                     Protobuf.Message message = Protobuf.Message.parseFrom(body.getContent());
                     System.out.println("onMessage: type=message id=" + body.getId() + " message=" + message.getText());
                     break;
-                case Type.BODY_PUSH:
-
+                case Type.BODY_LOGIN:
+                    Protobuf.Response response = Protobuf.Response.parseFrom(body.getContent());
+                    System.out.println("onMessage: 登陆响应: " + response.getData());
                     break;
                 default:
                     break;
@@ -141,7 +141,7 @@ public class Client2 extends Codec<Packet, Packet> implements Handle<Packet> {
     }
 
     private Packet login() {
-        Protobuf.Login login = Protobuf.Login.newBuilder().setUid(2).setToke("toke1").build();
+        Protobuf.Login login = Protobuf.Login.newBuilder().setToke("toke1").build();
         return packet(Type.BODY_LOGIN, login.toByteString());
     }
 
