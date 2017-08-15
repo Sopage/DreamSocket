@@ -12,12 +12,12 @@ import com.google.protobuf.ByteString;
 
 import java.nio.ByteBuffer;
 
-public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
+public class Client2 extends Codec<Packet, Packet> implements Handle<Packet> {
 
     private DreamSocket socket;
 
     public static void main(String[] args) {
-        Client client = new Client();
+        Client2 client = new Client2();
         DreamSocket socket = new DreamSocket();
         client.setSocket(socket);
         socket.isReadBuffer(true);
@@ -33,15 +33,15 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
 //            }
 //            socket.stop();
 //        }).start();
-        for (int i = 1; i < 1000; i++) {
-            try {
-                Thread.sleep(1000);
-                socket.send(client.message("I am user 1, index=" + i));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
+//        for (int i = 1; i < 1000; i++) {
+//            try {
+//                Thread.sleep(1000);
+//                socket.send(client.message("I am user 2, index=" + i));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
     }
 
     public void setSocket(DreamSocket socket) {
@@ -134,19 +134,19 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
     private Packet packet(int type, ByteString content) {
         Protobuf.Body body = Protobuf.Body.newBuilder()
                 .setId(String.valueOf(System.currentTimeMillis()))
-                .setSender(1)
+                .setSender(2)
                 .setType(type)
                 .setContent(content).build();
         return new Packet(body.toByteArray());
     }
 
     private Packet login() {
-        Protobuf.Login login = Protobuf.Login.newBuilder().setUid(1).setToke("toke1").build();
+        Protobuf.Login login = Protobuf.Login.newBuilder().setUid(2).setToke("toke1").build();
         return packet(Type.BODY_LOGIN, login.toByteString());
     }
 
     private Packet message(String text) {
-        Protobuf.Message message = Protobuf.Message.newBuilder().setReceiver(2).setType(Type.MESSAGE_SINGLE).setText(text).build();
+        Protobuf.Message message = Protobuf.Message.newBuilder().setReceiver(1).setType(Type.MESSAGE_SINGLE).setText(text).build();
         return packet(Type.BODY_MESSAGE, message.toByteString());
     }
 }

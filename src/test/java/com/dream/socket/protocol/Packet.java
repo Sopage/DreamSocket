@@ -7,4 +7,12 @@ public class Packet extends Protocol {
      */
     public byte[] body;
 
+    public Packet(){
+
+    }
+
+    public Packet(byte[] body){
+        this.body = body;
+    }
+
 }
