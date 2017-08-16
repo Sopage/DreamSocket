@@ -3,7 +3,7 @@ package com.dream.socket.codec;
 /**
  * 消息处理类
  * 解码后的消息会回调onReceive方法
- * @param <D>
+ * @param <D> 消息对象
  */
 public interface Handle<D> {
 

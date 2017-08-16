@@ -29,6 +29,6 @@ public abstract class ByteProcess {
     }
 
     protected void print(String text) {
-//        System.out.println(text);
+        System.out.println("DreamSocket: " + text);
     }
 }

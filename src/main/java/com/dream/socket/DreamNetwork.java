@@ -120,6 +120,6 @@ public abstract class DreamNetwork implements Runnable {
     }
 
     protected void printError(String text) {
-        System.err.println(text);
+        System.err.println("DreamSocket: " + text);
     }
 }
