@@ -39,18 +39,18 @@ public final class Protobuf {
      *消息类型
      * </pre>
      *
-     * <code>sint32 type = 2;</code>
+     * <code>int32 type = 2;</code>
      */
     int getType();
 
     /**
      * <pre>
-     *发送者
+     *发送者ID
      * </pre>
      *
-     * <code>sint64 sender = 3;</code>
+     * <code>int32 sender = 3;</code>
      */
-    long getSender();
+    int getSender();
 
     /**
      * <pre>
@@ -75,7 +75,7 @@ public final class Protobuf {
     private Body() {
       id_ = "";
       type_ = 0;
-      sender_ = 0L;
+      sender_ = 0;
       content_ = com.google.protobuf.ByteString.EMPTY;
     }
 
@@ -112,12 +112,12 @@ public final class Protobuf {
             }
             case 16: {
 
-              type_ = input.readSInt32();
+              type_ = input.readInt32();
               break;
             }
             case 24: {
 
-              sender_ = input.readSInt64();
+              sender_ = input.readInt32();
               break;
             }
             case 34: {
@@ -197,22 +197,22 @@ public final class Protobuf {
      *消息类型
      * </pre>
      *
-     * <code>sint32 type = 2;</code>
+     * <code>int32 type = 2;</code>
      */
     public int getType() {
       return type_;
     }
 
     public static final int SENDER_FIELD_NUMBER = 3;
-    private long sender_;
+    private int sender_;
     /**
      * <pre>
-     *发送者
+     *发送者ID
      * </pre>
      *
-     * <code>sint64 sender = 3;</code>
+     * <code>int32 sender = 3;</code>
      */
-    public long getSender() {
+    public int getSender() {
       return sender_;
     }
 
@@ -245,10 +245,10 @@ public final class Protobuf {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
       }
       if (type_ != 0) {
-        output.writeSInt32(2, type_);
+        output.writeInt32(2, type_);
       }
-      if (sender_ != 0L) {
-        output.writeSInt64(3, sender_);
+      if (sender_ != 0) {
+        output.writeInt32(3, sender_);
       }
       if (!content_.isEmpty()) {
         output.writeBytes(4, content_);
@@ -265,11 +265,11 @@ public final class Protobuf {
       }
       if (type_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(2, type_);
+          .computeInt32Size(2, type_);
       }
-      if (sender_ != 0L) {
+      if (sender_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(3, sender_);
+          .computeInt32Size(3, sender_);
       }
       if (!content_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
@@ -314,8 +314,7 @@ public final class Protobuf {
       hash = (37 * hash) + TYPE_FIELD_NUMBER;
       hash = (53 * hash) + getType();
       hash = (37 * hash) + SENDER_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getSender());
+      hash = (53 * hash) + getSender();
       hash = (37 * hash) + CONTENT_FIELD_NUMBER;
       hash = (53 * hash) + getContent().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -451,7 +450,7 @@ public final class Protobuf {
 
         type_ = 0;
 
-        sender_ = 0L;
+        sender_ = 0;
 
         content_ = com.google.protobuf.ByteString.EMPTY;
 
@@ -529,7 +528,7 @@ public final class Protobuf {
         if (other.getType() != 0) {
           setType(other.getType());
         }
-        if (other.getSender() != 0L) {
+        if (other.getSender() != 0) {
           setSender(other.getSender());
         }
         if (other.getContent() != com.google.protobuf.ByteString.EMPTY) {
@@ -656,7 +655,7 @@ public final class Protobuf {
        *消息类型
        * </pre>
        *
-       * <code>sint32 type = 2;</code>
+       * <code>int32 type = 2;</code>
        */
       public int getType() {
         return type_;
@@ -666,7 +665,7 @@ public final class Protobuf {
        *消息类型
        * </pre>
        *
-       * <code>sint32 type = 2;</code>
+       * <code>int32 type = 2;</code>
        */
       public Builder setType(int value) {
         
@@ -679,7 +678,7 @@ public final class Protobuf {
        *消息类型
        * </pre>
        *
-       * <code>sint32 type = 2;</code>
+       * <code>int32 type = 2;</code>
        */
       public Builder clearType() {
         
@@ -688,25 +687,25 @@ public final class Protobuf {
         return this;
       }
 
-      private long sender_ ;
+      private int sender_ ;
       /**
        * <pre>
-       *发送者
+       *发送者ID
        * </pre>
        *
-       * <code>sint64 sender = 3;</code>
+       * <code>int32 sender = 3;</code>
        */
-      public long getSender() {
+      public int getSender() {
         return sender_;
       }
       /**
        * <pre>
-       *发送者
+       *发送者ID
        * </pre>
        *
-       * <code>sint64 sender = 3;</code>
+       * <code>int32 sender = 3;</code>
        */
-      public Builder setSender(long value) {
+      public Builder setSender(int value) {
         
         sender_ = value;
         onChanged();
@@ -714,14 +713,14 @@ public final class Protobuf {
       }
       /**
        * <pre>
-       *发送者
+       *发送者ID
        * </pre>
        *
-       * <code>sint64 sender = 3;</code>
+       * <code>int32 sender = 3;</code>
        */
       public Builder clearSender() {
         
-        sender_ = 0L;
+        sender_ = 0;
         onChanged();
         return this;
       }
@@ -1335,19 +1334,10 @@ public final class Protobuf {
 
     /**
      * <pre>
-     *消息类型
-     * </pre>
-     *
-     * <code>sint32 type = 1;</code>
-     */
-    int getType();
-
-    /**
-     * <pre>
      *相应状态码
      * </pre>
      *
-     * <code>sint32 code = 2;</code>
+     * <code>int32 code = 1;</code>
      */
     int getCode();
 
@@ -1356,18 +1346,9 @@ public final class Protobuf {
      *数据
      * </pre>
      *
-     * <code>string data = 3;</code>
+     * <code>bytes data = 2;</code>
      */
-    String getData();
-    /**
-     * <pre>
-     *数据
-     * </pre>
-     *
-     * <code>string data = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getDataBytes();
+    com.google.protobuf.ByteString getData();
   }
   /**
    * Protobuf type {@code Response}
@@ -1381,9 +1362,8 @@ public final class Protobuf {
       super(builder);
     }
     private Response() {
-      type_ = 0;
       code_ = 0;
-      data_ = "";
+      data_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @Override
@@ -1413,18 +1393,12 @@ public final class Protobuf {
             }
             case 8: {
 
-              type_ = input.readSInt32();
+              code_ = input.readInt32();
               break;
             }
-            case 16: {
+            case 18: {
 
-              code_ = input.readSInt32();
-              break;
-            }
-            case 26: {
-              String s = input.readStringRequireUtf8();
-
-              data_ = s;
+              data_ = input.readBytes();
               break;
             }
           }
@@ -1450,72 +1424,30 @@ public final class Protobuf {
               Response.class, Builder.class);
     }
 
-    public static final int TYPE_FIELD_NUMBER = 1;
-    private int type_;
-    /**
-     * <pre>
-     *消息类型
-     * </pre>
-     *
-     * <code>sint32 type = 1;</code>
-     */
-    public int getType() {
-      return type_;
-    }
-
-    public static final int CODE_FIELD_NUMBER = 2;
+    public static final int CODE_FIELD_NUMBER = 1;
     private int code_;
     /**
      * <pre>
      *相应状态码
      * </pre>
      *
-     * <code>sint32 code = 2;</code>
+     * <code>int32 code = 1;</code>
      */
     public int getCode() {
       return code_;
     }
 
-    public static final int DATA_FIELD_NUMBER = 3;
-    private volatile Object data_;
+    public static final int DATA_FIELD_NUMBER = 2;
+    private com.google.protobuf.ByteString data_;
     /**
      * <pre>
      *数据
      * </pre>
      *
-     * <code>string data = 3;</code>
+     * <code>bytes data = 2;</code>
      */
-    public String getData() {
-      Object ref = data_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        data_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     *数据
-     * </pre>
-     *
-     * <code>string data = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getDataBytes() {
-      Object ref = data_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (String) ref);
-        data_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public com.google.protobuf.ByteString getData() {
+      return data_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1530,14 +1462,11 @@ public final class Protobuf {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (type_ != 0) {
-        output.writeSInt32(1, type_);
-      }
       if (code_ != 0) {
-        output.writeSInt32(2, code_);
+        output.writeInt32(1, code_);
       }
-      if (!getDataBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, data_);
+      if (!data_.isEmpty()) {
+        output.writeBytes(2, data_);
       }
     }
 
@@ -1546,16 +1475,13 @@ public final class Protobuf {
       if (size != -1) return size;
 
       size = 0;
-      if (type_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(1, type_);
-      }
       if (code_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(2, code_);
+          .computeInt32Size(1, code_);
       }
-      if (!getDataBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, data_);
+      if (!data_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, data_);
       }
       memoizedSize = size;
       return size;
@@ -1573,8 +1499,6 @@ public final class Protobuf {
       Response other = (Response) obj;
 
       boolean result = true;
-      result = result && (getType()
-          == other.getType());
       result = result && (getCode()
           == other.getCode());
       result = result && getData()
@@ -1589,8 +1513,6 @@ public final class Protobuf {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + TYPE_FIELD_NUMBER;
-      hash = (53 * hash) + getType();
       hash = (37 * hash) + CODE_FIELD_NUMBER;
       hash = (53 * hash) + getCode();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
@@ -1724,11 +1646,9 @@ public final class Protobuf {
       }
       public Builder clear() {
         super.clear();
-        type_ = 0;
-
         code_ = 0;
 
-        data_ = "";
+        data_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
       }
@@ -1752,7 +1672,6 @@ public final class Protobuf {
 
       public Response buildPartial() {
         Response result = new Response(this);
-        result.type_ = type_;
         result.code_ = code_;
         result.data_ = data_;
         onBuilt();
@@ -1796,15 +1715,11 @@ public final class Protobuf {
 
       public Builder mergeFrom(Response other) {
         if (other == Response.getDefaultInstance()) return this;
-        if (other.getType() != 0) {
-          setType(other.getType());
-        }
         if (other.getCode() != 0) {
           setCode(other.getCode());
         }
-        if (!other.getData().isEmpty()) {
-          data_ = other.data_;
-          onChanged();
+        if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
+          setData(other.getData());
         }
         onChanged();
         return this;
@@ -1832,51 +1747,13 @@ public final class Protobuf {
         return this;
       }
 
-      private int type_ ;
-      /**
-       * <pre>
-       *消息类型
-       * </pre>
-       *
-       * <code>sint32 type = 1;</code>
-       */
-      public int getType() {
-        return type_;
-      }
-      /**
-       * <pre>
-       *消息类型
-       * </pre>
-       *
-       * <code>sint32 type = 1;</code>
-       */
-      public Builder setType(int value) {
-        
-        type_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       *消息类型
-       * </pre>
-       *
-       * <code>sint32 type = 1;</code>
-       */
-      public Builder clearType() {
-        
-        type_ = 0;
-        onChanged();
-        return this;
-      }
-
       private int code_ ;
       /**
        * <pre>
        *相应状态码
        * </pre>
        *
-       * <code>sint32 code = 2;</code>
+       * <code>int32 code = 1;</code>
        */
       public int getCode() {
         return code_;
@@ -1886,7 +1763,7 @@ public final class Protobuf {
        *相应状态码
        * </pre>
        *
-       * <code>sint32 code = 2;</code>
+       * <code>int32 code = 1;</code>
        */
       public Builder setCode(int value) {
         
@@ -1899,7 +1776,7 @@ public final class Protobuf {
        *相应状态码
        * </pre>
        *
-       * <code>sint32 code = 2;</code>
+       * <code>int32 code = 1;</code>
        */
       public Builder clearCode() {
         
@@ -1908,55 +1785,25 @@ public final class Protobuf {
         return this;
       }
 
-      private Object data_ = "";
+      private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <pre>
        *数据
        * </pre>
        *
-       * <code>string data = 3;</code>
+       * <code>bytes data = 2;</code>
        */
-      public String getData() {
-        Object ref = data_;
-        if (!(ref instanceof String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          String s = bs.toStringUtf8();
-          data_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public com.google.protobuf.ByteString getData() {
+        return data_;
       }
       /**
        * <pre>
        *数据
        * </pre>
        *
-       * <code>string data = 3;</code>
+       * <code>bytes data = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getDataBytes() {
-        Object ref = data_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (String) ref);
-          data_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       *数据
-       * </pre>
-       *
-       * <code>string data = 3;</code>
-       */
-      public Builder setData(
-          String value) {
+      public Builder setData(com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -1970,29 +1817,11 @@ public final class Protobuf {
        *数据
        * </pre>
        *
-       * <code>string data = 3;</code>
+       * <code>bytes data = 2;</code>
        */
       public Builder clearData() {
         
         data_ = getDefaultInstance().getData();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       *数据
-       * </pre>
-       *
-       * <code>string data = 3;</code>
-       */
-      public Builder setDataBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        data_ = value;
         onChanged();
         return this;
       }
@@ -2054,7 +1883,7 @@ public final class Protobuf {
      *接收者
      * </pre>
      *
-     * <code>sint64 receiver = 1;</code>
+     * <code>int64 receiver = 1;</code>
      */
     long getReceiver();
 
@@ -2063,27 +1892,18 @@ public final class Protobuf {
      *聊天消息类型
      * </pre>
      *
-     * <code>sint32 type = 2;</code>
+     * <code>int32 type = 2;</code>
      */
     int getType();
 
     /**
      * <pre>
-     *文本内容
+     *内容
      * </pre>
      *
-     * <code>string text = 3;</code>
+     * <code>bytes content = 3;</code>
      */
-    String getText();
-    /**
-     * <pre>
-     *文本内容
-     * </pre>
-     *
-     * <code>string text = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getTextBytes();
+    com.google.protobuf.ByteString getContent();
   }
   /**
    * Protobuf type {@code Message}
@@ -2099,7 +1919,7 @@ public final class Protobuf {
     private Message() {
       receiver_ = 0L;
       type_ = 0;
-      text_ = "";
+      content_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @Override
@@ -2129,18 +1949,17 @@ public final class Protobuf {
             }
             case 8: {
 
-              receiver_ = input.readSInt64();
+              receiver_ = input.readInt64();
               break;
             }
             case 16: {
 
-              type_ = input.readSInt32();
+              type_ = input.readInt32();
               break;
             }
             case 26: {
-              String s = input.readStringRequireUtf8();
 
-              text_ = s;
+              content_ = input.readBytes();
               break;
             }
           }
@@ -2173,7 +1992,7 @@ public final class Protobuf {
      *接收者
      * </pre>
      *
-     * <code>sint64 receiver = 1;</code>
+     * <code>int64 receiver = 1;</code>
      */
     public long getReceiver() {
       return receiver_;
@@ -2186,52 +2005,23 @@ public final class Protobuf {
      *聊天消息类型
      * </pre>
      *
-     * <code>sint32 type = 2;</code>
+     * <code>int32 type = 2;</code>
      */
     public int getType() {
       return type_;
     }
 
-    public static final int TEXT_FIELD_NUMBER = 3;
-    private volatile Object text_;
+    public static final int CONTENT_FIELD_NUMBER = 3;
+    private com.google.protobuf.ByteString content_;
     /**
      * <pre>
-     *文本内容
+     *内容
      * </pre>
      *
-     * <code>string text = 3;</code>
+     * <code>bytes content = 3;</code>
      */
-    public String getText() {
-      Object ref = text_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        text_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     *文本内容
-     * </pre>
-     *
-     * <code>string text = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getTextBytes() {
-      Object ref = text_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (String) ref);
-        text_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public com.google.protobuf.ByteString getContent() {
+      return content_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2247,13 +2037,13 @@ public final class Protobuf {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (receiver_ != 0L) {
-        output.writeSInt64(1, receiver_);
+        output.writeInt64(1, receiver_);
       }
       if (type_ != 0) {
-        output.writeSInt32(2, type_);
+        output.writeInt32(2, type_);
       }
-      if (!getTextBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, text_);
+      if (!content_.isEmpty()) {
+        output.writeBytes(3, content_);
       }
     }
 
@@ -2264,14 +2054,15 @@ public final class Protobuf {
       size = 0;
       if (receiver_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(1, receiver_);
+          .computeInt64Size(1, receiver_);
       }
       if (type_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(2, type_);
+          .computeInt32Size(2, type_);
       }
-      if (!getTextBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, text_);
+      if (!content_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, content_);
       }
       memoizedSize = size;
       return size;
@@ -2293,8 +2084,8 @@ public final class Protobuf {
           == other.getReceiver());
       result = result && (getType()
           == other.getType());
-      result = result && getText()
-          .equals(other.getText());
+      result = result && getContent()
+          .equals(other.getContent());
       return result;
     }
 
@@ -2310,8 +2101,8 @@ public final class Protobuf {
           getReceiver());
       hash = (37 * hash) + TYPE_FIELD_NUMBER;
       hash = (53 * hash) + getType();
-      hash = (37 * hash) + TEXT_FIELD_NUMBER;
-      hash = (53 * hash) + getText().hashCode();
+      hash = (37 * hash) + CONTENT_FIELD_NUMBER;
+      hash = (53 * hash) + getContent().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2445,7 +2236,7 @@ public final class Protobuf {
 
         type_ = 0;
 
-        text_ = "";
+        content_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
       }
@@ -2471,7 +2262,7 @@ public final class Protobuf {
         Message result = new Message(this);
         result.receiver_ = receiver_;
         result.type_ = type_;
-        result.text_ = text_;
+        result.content_ = content_;
         onBuilt();
         return result;
       }
@@ -2519,9 +2310,8 @@ public final class Protobuf {
         if (other.getType() != 0) {
           setType(other.getType());
         }
-        if (!other.getText().isEmpty()) {
-          text_ = other.text_;
-          onChanged();
+        if (other.getContent() != com.google.protobuf.ByteString.EMPTY) {
+          setContent(other.getContent());
         }
         onChanged();
         return this;
@@ -2555,7 +2345,7 @@ public final class Protobuf {
        *接收者
        * </pre>
        *
-       * <code>sint64 receiver = 1;</code>
+       * <code>int64 receiver = 1;</code>
        */
       public long getReceiver() {
         return receiver_;
@@ -2565,7 +2355,7 @@ public final class Protobuf {
        *接收者
        * </pre>
        *
-       * <code>sint64 receiver = 1;</code>
+       * <code>int64 receiver = 1;</code>
        */
       public Builder setReceiver(long value) {
         
@@ -2578,7 +2368,7 @@ public final class Protobuf {
        *接收者
        * </pre>
        *
-       * <code>sint64 receiver = 1;</code>
+       * <code>int64 receiver = 1;</code>
        */
       public Builder clearReceiver() {
         
@@ -2593,7 +2383,7 @@ public final class Protobuf {
        *聊天消息类型
        * </pre>
        *
-       * <code>sint32 type = 2;</code>
+       * <code>int32 type = 2;</code>
        */
       public int getType() {
         return type_;
@@ -2603,7 +2393,7 @@ public final class Protobuf {
        *聊天消息类型
        * </pre>
        *
-       * <code>sint32 type = 2;</code>
+       * <code>int32 type = 2;</code>
        */
       public Builder setType(int value) {
         
@@ -2616,7 +2406,7 @@ public final class Protobuf {
        *聊天消息类型
        * </pre>
        *
-       * <code>sint32 type = 2;</code>
+       * <code>int32 type = 2;</code>
        */
       public Builder clearType() {
         
@@ -2625,91 +2415,43 @@ public final class Protobuf {
         return this;
       }
 
-      private Object text_ = "";
+      private com.google.protobuf.ByteString content_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <pre>
-       *文本内容
+       *内容
        * </pre>
        *
-       * <code>string text = 3;</code>
+       * <code>bytes content = 3;</code>
        */
-      public String getText() {
-        Object ref = text_;
-        if (!(ref instanceof String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          String s = bs.toStringUtf8();
-          text_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public com.google.protobuf.ByteString getContent() {
+        return content_;
       }
       /**
        * <pre>
-       *文本内容
+       *内容
        * </pre>
        *
-       * <code>string text = 3;</code>
+       * <code>bytes content = 3;</code>
        */
-      public com.google.protobuf.ByteString
-          getTextBytes() {
-        Object ref = text_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (String) ref);
-          text_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       *文本内容
-       * </pre>
-       *
-       * <code>string text = 3;</code>
-       */
-      public Builder setText(
-          String value) {
+      public Builder setContent(com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        text_ = value;
+        content_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       *文本内容
+       *内容
        * </pre>
        *
-       * <code>string text = 3;</code>
+       * <code>bytes content = 3;</code>
        */
-      public Builder clearText() {
+      public Builder clearContent() {
         
-        text_ = getDefaultInstance().getText();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       *文本内容
-       * </pre>
-       *
-       * <code>string text = 3;</code>
-       */
-      public Builder setTextBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        text_ = value;
+        content_ = getDefaultInstance().getContent();
         onChanged();
         return this;
       }
@@ -2792,11 +2534,11 @@ public final class Protobuf {
   static {
     String[] descriptorData = {
       "\n\016protobuf.proto\"A\n\004Body\022\n\n\002id\030\001 \001(\t\022\014\n\004" +
-      "type\030\002 \001(\021\022\016\n\006sender\030\003 \001(\022\022\017\n\007content\030\004 " +
-      "\001(\014\"\025\n\005Login\022\014\n\004toke\030\001 \001(\t\"4\n\010Response\022\014" +
-      "\n\004type\030\001 \001(\021\022\014\n\004code\030\002 \001(\021\022\014\n\004data\030\003 \001(\t" +
-      "\"7\n\007Message\022\020\n\010receiver\030\001 \001(\022\022\014\n\004type\030\002 " +
-      "\001(\021\022\014\n\004text\030\003 \001(\tb\006proto3"
+      "type\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\022\017\n\007content\030\004 " +
+      "\001(\014\"\025\n\005Login\022\014\n\004toke\030\001 \001(\t\"&\n\010Response\022\014" +
+      "\n\004code\030\001 \001(\005\022\014\n\004data\030\002 \001(\014\":\n\007Message\022\020\n" +
+      "\010receiver\030\001 \001(\003\022\014\n\004type\030\002 \001(\005\022\017\n\007content" +
+      "\030\003 \001(\014b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2827,13 +2569,13 @@ public final class Protobuf {
     internal_static_Response_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Response_descriptor,
-        new String[] { "Type", "Code", "Data", });
+        new String[] { "Code", "Data", });
     internal_static_Message_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Message_descriptor,
-        new String[] { "Receiver", "Type", "Text", });
+        new String[] { "Receiver", "Type", "Content", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

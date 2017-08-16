@@ -115,11 +115,11 @@ public class Client2 extends Codec<Packet, Packet> implements Handle<Packet> {
                     break;
                 case Type.BODY_MESSAGE:
                     Protobuf.Message message = Protobuf.Message.parseFrom(body.getContent());
-                    System.out.println("onMessage: type=message id=" + body.getId() + " message=" + message.getText());
+                    System.out.println("onMessage: type=message id=" + body.getId() + " message=" + message.getContent().toStringUtf8());
                     break;
                 case Type.BODY_LOGIN:
                     Protobuf.Response response = Protobuf.Response.parseFrom(body.getContent());
-                    System.out.println("onMessage: 登陆响应: " + response.getData());
+                    System.out.println("onMessage: 登陆响应: " + response.getData().toStringUtf8());
                     break;
                 default:
                     break;
@@ -146,7 +146,10 @@ public class Client2 extends Codec<Packet, Packet> implements Handle<Packet> {
     }
 
     private Packet message(String text) {
-        Protobuf.Message message = Protobuf.Message.newBuilder().setReceiver(1).setType(Type.MESSAGE_SINGLE).setText(text).build();
+        Protobuf.Message message = Protobuf.Message.newBuilder()
+                .setReceiver(1)
+                .setType(Type.MESSAGE_SINGLE)
+                .setContent(ByteString.copyFromUtf8(text)).build();
         return packet(Type.BODY_MESSAGE, message.toByteString());
     }
 }
