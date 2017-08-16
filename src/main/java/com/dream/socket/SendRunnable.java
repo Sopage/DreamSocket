@@ -1,6 +1,7 @@
 package com.dream.socket;
 
 import com.dream.socket.codec.Codec;
+import com.dream.socket.config.Config;
 
 import java.nio.ByteBuffer;
 import java.util.Vector;
@@ -19,6 +20,7 @@ public abstract class SendRunnable implements Runnable {
     public void run() {
         synchronized (this) {
             sending = true;
+            Config.getConfig().getLogger().debug("start 开启发送线程！");
             while (sending) {
                 if (vector.size() == 0) {
                     try {
@@ -37,6 +39,7 @@ public abstract class SendRunnable implements Runnable {
                 }
             }
         }
+        Config.getConfig().getLogger().debug("stop 结束发送线程！");
     }
 
     public void stop() {

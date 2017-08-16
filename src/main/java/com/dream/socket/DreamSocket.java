@@ -1,6 +1,7 @@
 package com.dream.socket;
 
 import com.dream.socket.codec.Handle;
+import com.dream.socket.config.Config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +45,7 @@ public class DreamSocket extends DreamNetwork {
                         address = new InetSocketAddress(host, port);
                     }
                     socket = new Socket();
+                    socket.setSoTimeout(30 * 1000);
                     socket.connect(address);
                     if (socket.isConnected()) {
                         send.setOutputStream(socket.getOutputStream());
@@ -57,19 +59,18 @@ public class DreamSocket extends DreamNetwork {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    printError("连接错误");
+                    Config.getConfig().getLogger().error("连接出现错误", e);
                 } finally {
                     try {
                         this.stopSendAndHandler();
                         socket = null;
                         if (isRunning()) {
                             this.status(Handle.STATUS_FAIL);
-                            printError("6秒后尝试重连");
+                            Config.getConfig().getLogger().warn("6秒后尝试重连");
                             this.wait(6000);
                         }
                     } catch (InterruptedException ie) {
-                        printError("重连发生异常");
+                        Config.getConfig().getLogger().error("重连发生异常", ie);
                     }
                 }
             }

@@ -5,7 +5,6 @@ import com.dream.socket.HandleRunnable;
 public abstract class ByteProcess {
 
     protected Codec codec;
-
     protected HandleRunnable handle;
 
     public void setCodec(Codec codec) {
@@ -24,11 +23,7 @@ public abstract class ByteProcess {
 
     public abstract void reset();
 
-    public boolean codecIsNull(){
+    public boolean codecIsNull() {
         return codec == null;
-    }
-
-    protected void print(String text) {
-        System.out.println("DreamSocket: " + text);
     }
 }

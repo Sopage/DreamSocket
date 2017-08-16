@@ -1,6 +1,7 @@
 package com.dream.socket;
 
 import com.dream.socket.codec.*;
+import com.dream.socket.config.Config;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +54,7 @@ public abstract class DreamNetwork implements Runnable {
         }
         if (pool != null) {
             if (!pool.isShutdown()) {
-                pool.shutdown();
+                pool.shutdownNow();
             }
             pool = null;
         }
@@ -67,7 +68,7 @@ public abstract class DreamNetwork implements Runnable {
         stopSendAndHandler();
         doStop();
         if (pool != null && !pool.isShutdown()) {
-            pool.shutdown();
+            pool.shutdownNow();
         }
     }
 
@@ -82,6 +83,7 @@ public abstract class DreamNetwork implements Runnable {
     @Override
     public final void run() {
         doStartUp();
+        Config.getConfig().getLogger().error("连接关闭并停止！");
     }
 
     public boolean isRunning() {
@@ -117,9 +119,5 @@ public abstract class DreamNetwork implements Runnable {
         if (this.handle != null) {
             this.handle.status(status);
         }
-    }
-
-    protected void printError(String text) {
-        System.err.println("DreamSocket: " + text);
     }
 }

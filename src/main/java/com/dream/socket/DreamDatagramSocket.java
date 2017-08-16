@@ -1,6 +1,7 @@
 package com.dream.socket;
 
 import com.dream.socket.codec.Handle;
+import com.dream.socket.config.Config;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -43,8 +44,7 @@ public class DreamDatagramSocket extends DreamNetwork {
                     this.decode(packet.getData(), packet.getOffset(), packet.getLength());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                printError("接收数据错误");
+                Config.getConfig().getLogger().error("接收数据错误", e);
             } finally {
                 try {
                     socket.disconnect();
@@ -58,8 +58,9 @@ public class DreamDatagramSocket extends DreamNetwork {
                     this.status(Handle.STATUS_FAIL);
                     try {
                         this.wait(6000);
+                        Config.getConfig().getLogger().error("6秒好重新开启等待");
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Config.getConfig().getLogger().error("接收数据错误", e);
                     }
                 }
             }

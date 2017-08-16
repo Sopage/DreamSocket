@@ -1,5 +1,7 @@
 package com.dream.socket;
 
+import com.dream.socket.config.Config;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -33,7 +35,7 @@ public class DatagramSocketSendRunnable extends SendRunnable {
             try {
                 socket.send(new DatagramPacket(buffer, offset, length, address));
             } catch (IOException e) {
-                e.printStackTrace();
+                Config.getConfig().getLogger().error("UDP数据发送异常！", e);
             }
         }
     }

@@ -21,21 +21,21 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
         DreamSocket socket = new DreamSocket();
         client.setSocket(socket);
         socket.isReadBuffer(true);
-        socket.setAddress("192.168.31.43", 6969);
+        socket.setAddress("localhost", 6969);
         socket.setHandle(client);
         socket.setCodec(client);
         socket.start();
-//        new Thread(()->{
-//            try {
-//                Thread.sleep(20000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            socket.stop();
-//        }).start();
-        for (int i = 1; i < 1000; i++) {
+        new Thread(()->{
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            socket.stop();
+        }).start();
+        for (int i = 1; i < 10; i++) {
+            try {
+                Thread.sleep(100);
                 socket.send(client.message("I am user 1, index=" + i));
             } catch (Exception e) {
                 e.printStackTrace();

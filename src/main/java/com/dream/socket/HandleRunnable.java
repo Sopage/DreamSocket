@@ -1,6 +1,7 @@
 package com.dream.socket;
 
 import com.dream.socket.codec.Handle;
+import com.dream.socket.config.Config;
 
 import java.util.Vector;
 
@@ -18,6 +19,7 @@ public class HandleRunnable implements Runnable {
     public void run() {
         synchronized (this) {
             running = true;
+            Config.getConfig().getLogger().debug("start 开启接收线程！");
             while (running) {
                 if (vector.size() == 0) {
                     try {
@@ -35,6 +37,7 @@ public class HandleRunnable implements Runnable {
                 }
             }
         }
+        Config.getConfig().getLogger().debug("stop 结束接收线程！");
     }
 
     public void put(Object d) {
