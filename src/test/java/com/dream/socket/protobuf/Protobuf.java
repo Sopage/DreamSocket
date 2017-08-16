@@ -1883,9 +1883,9 @@ public final class Protobuf {
      *接收者
      * </pre>
      *
-     * <code>int64 receiver = 1;</code>
+     * <code>int32 receiver = 1;</code>
      */
-    long getReceiver();
+    int getReceiver();
 
     /**
      * <pre>
@@ -1917,7 +1917,7 @@ public final class Protobuf {
       super(builder);
     }
     private Message() {
-      receiver_ = 0L;
+      receiver_ = 0;
       type_ = 0;
       content_ = com.google.protobuf.ByteString.EMPTY;
     }
@@ -1949,7 +1949,7 @@ public final class Protobuf {
             }
             case 8: {
 
-              receiver_ = input.readInt64();
+              receiver_ = input.readInt32();
               break;
             }
             case 16: {
@@ -1986,15 +1986,15 @@ public final class Protobuf {
     }
 
     public static final int RECEIVER_FIELD_NUMBER = 1;
-    private long receiver_;
+    private int receiver_;
     /**
      * <pre>
      *接收者
      * </pre>
      *
-     * <code>int64 receiver = 1;</code>
+     * <code>int32 receiver = 1;</code>
      */
-    public long getReceiver() {
+    public int getReceiver() {
       return receiver_;
     }
 
@@ -2036,8 +2036,8 @@ public final class Protobuf {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (receiver_ != 0L) {
-        output.writeInt64(1, receiver_);
+      if (receiver_ != 0) {
+        output.writeInt32(1, receiver_);
       }
       if (type_ != 0) {
         output.writeInt32(2, type_);
@@ -2052,9 +2052,9 @@ public final class Protobuf {
       if (size != -1) return size;
 
       size = 0;
-      if (receiver_ != 0L) {
+      if (receiver_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(1, receiver_);
+          .computeInt32Size(1, receiver_);
       }
       if (type_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -2097,8 +2097,7 @@ public final class Protobuf {
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + RECEIVER_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getReceiver());
+      hash = (53 * hash) + getReceiver();
       hash = (37 * hash) + TYPE_FIELD_NUMBER;
       hash = (53 * hash) + getType();
       hash = (37 * hash) + CONTENT_FIELD_NUMBER;
@@ -2232,7 +2231,7 @@ public final class Protobuf {
       }
       public Builder clear() {
         super.clear();
-        receiver_ = 0L;
+        receiver_ = 0;
 
         type_ = 0;
 
@@ -2304,7 +2303,7 @@ public final class Protobuf {
 
       public Builder mergeFrom(Message other) {
         if (other == Message.getDefaultInstance()) return this;
-        if (other.getReceiver() != 0L) {
+        if (other.getReceiver() != 0) {
           setReceiver(other.getReceiver());
         }
         if (other.getType() != 0) {
@@ -2339,15 +2338,15 @@ public final class Protobuf {
         return this;
       }
 
-      private long receiver_ ;
+      private int receiver_ ;
       /**
        * <pre>
        *接收者
        * </pre>
        *
-       * <code>int64 receiver = 1;</code>
+       * <code>int32 receiver = 1;</code>
        */
-      public long getReceiver() {
+      public int getReceiver() {
         return receiver_;
       }
       /**
@@ -2355,9 +2354,9 @@ public final class Protobuf {
        *接收者
        * </pre>
        *
-       * <code>int64 receiver = 1;</code>
+       * <code>int32 receiver = 1;</code>
        */
-      public Builder setReceiver(long value) {
+      public Builder setReceiver(int value) {
         
         receiver_ = value;
         onChanged();
@@ -2368,11 +2367,11 @@ public final class Protobuf {
        *接收者
        * </pre>
        *
-       * <code>int64 receiver = 1;</code>
+       * <code>int32 receiver = 1;</code>
        */
       public Builder clearReceiver() {
         
-        receiver_ = 0L;
+        receiver_ = 0;
         onChanged();
         return this;
       }
@@ -2537,7 +2536,7 @@ public final class Protobuf {
       "type\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\022\017\n\007content\030\004 " +
       "\001(\014\"\025\n\005Login\022\014\n\004toke\030\001 \001(\t\"&\n\010Response\022\014" +
       "\n\004code\030\001 \001(\005\022\014\n\004data\030\002 \001(\014\":\n\007Message\022\020\n" +
-      "\010receiver\030\001 \001(\003\022\014\n\004type\030\002 \001(\005\022\017\n\007content" +
+      "\010receiver\030\001 \001(\005\022\014\n\004type\030\002 \001(\005\022\017\n\007content" +
       "\030\003 \001(\014b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
