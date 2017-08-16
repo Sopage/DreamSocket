@@ -5,6 +5,10 @@ def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {

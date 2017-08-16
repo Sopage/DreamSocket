@@ -21,7 +21,7 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
         DreamSocket socket = new DreamSocket();
         client.setSocket(socket);
         socket.isReadBuffer(true);
-        socket.setAddress("127.0.0.1", 6969);
+        socket.setAddress("192.168.31.43", 6969);
         socket.setHandle(client);
         socket.setCodec(client);
         socket.start();
@@ -101,6 +101,7 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
     @Override
     public void onStatus(int status) {
         if (status == Handle.STATUS_CONNECTED) {
+            System.out.println("-----> status=" + status);
             socket.send(login());
         }
     }
