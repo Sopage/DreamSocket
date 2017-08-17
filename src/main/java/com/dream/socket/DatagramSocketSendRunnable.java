@@ -26,7 +26,7 @@ public class DatagramSocketSendRunnable extends SendRunnable {
     }
 
     @Override
-    protected void doSend(byte[] buffer, int offset, int length) {
+    protected boolean doSend(byte[] buffer, int offset, int length) {
         if(isAddressChanged){
             isAddressChanged = false;
             address = new InetSocketAddress(host, port);
@@ -34,9 +34,11 @@ public class DatagramSocketSendRunnable extends SendRunnable {
         if (socket != null && address != null) {
             try {
                 socket.send(new DatagramPacket(buffer, offset, length, address));
+                return true;
             } catch (IOException e) {
                 Config.getConfig().getLogger().error("UDP数据发送异常！", e);
             }
         }
+        return false;
     }
 }

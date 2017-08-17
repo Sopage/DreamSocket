@@ -2,11 +2,12 @@ package com.dream.socket;
 
 import com.dream.socket.codec.*;
 import com.dream.socket.config.Config;
+import com.dream.socket.listener.OnStartListener;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class DreamNetwork implements Runnable {
+public abstract class DreamNetwork implements Runnable, OnStartListener {
 
     private ExecutorService pool;
     private SendRunnable sendRunnable;
@@ -100,8 +101,10 @@ public abstract class DreamNetwork implements Runnable {
         }
     }
 
-    protected void startSendAndHandler() {
+    protected void startSendAndHandler(OnStartListener listener) {
         this.process.reset();
+        sendRunnable.setOnStartListener(listener);
+        handle.setOnStartListener(listener);
         this.pool.execute(sendRunnable);
         this.pool.execute(handle);
     }

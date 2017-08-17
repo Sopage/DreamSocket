@@ -35,7 +35,7 @@ public class DreamDatagramSocket extends DreamNetwork {
             try {
                 socket = new DatagramSocket();
                 send.setDatagramSocket(socket);
-                this.startSendAndHandler();
+                this.startSendAndHandler(this);
                 final byte[] bytes = new byte[102400];
                 DatagramPacket packet;
                 while (isRunning()) {
@@ -70,6 +70,14 @@ public class DreamDatagramSocket extends DreamNetwork {
     @Override
     public SendRunnable getSendRunnable() {
         return send;
+    }
+
+    @Override
+    public void onStart(Runnable runnable) {
+        if (runnable instanceof SendRunnable && isConnected()) {
+        } else if (runnable instanceof HandleRunnable && isConnected()) {
+
+        }
     }
 
 }

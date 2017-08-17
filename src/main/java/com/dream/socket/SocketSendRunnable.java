@@ -13,17 +13,19 @@ public final class SocketSendRunnable extends SendRunnable {
     }
 
     @Override
-    protected void doSend(byte[] buffer, int offset, int length) {
+    protected boolean doSend(byte[] buffer, int offset, int length) {
         if (out != null) {
             try {
                 out.write(buffer, offset, length);
                 out.flush();
+                return true;
             } catch (Exception e) {
                 Config.getConfig().getLogger().error("发送数据异常！", e);
             }
         } else {
             Config.getConfig().getLogger().warn("发送管道为NULL！");
         }
+        return false;
     }
 
     @Override

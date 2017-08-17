@@ -2,6 +2,7 @@ package com.dream.socket;
 
 import com.dream.socket.codec.Codec;
 import com.dream.socket.config.Config;
+import com.dream.socket.listener.OnStartListener;
 
 import java.nio.ByteBuffer;
 import java.util.Vector;
@@ -10,10 +11,16 @@ public abstract class SendRunnable implements Runnable {
     private Vector<Object> vector = new Vector<>();
     private Codec codec;
     private boolean sending;
+    private OnStartListener listener;
+
     private ByteBuffer buffer = ByteBuffer.allocate(102400);
 
     public void setCodec(Codec codec) {
         this.codec = codec;
+    }
+
+    public void setOnStartListener(OnStartListener listener){
+        this.listener = listener;
     }
 
     @Override
@@ -21,12 +28,15 @@ public abstract class SendRunnable implements Runnable {
         synchronized (this) {
             sending = true;
             Config.getConfig().getLogger().debug("start 开启发送线程！");
+            if(listener != null){
+                listener.onStart(this);
+            }
             while (sending) {
                 if (vector.size() == 0) {
                     try {
                         this.wait();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Config.getConfig().getLogger().error("发送线程等待异常！", e);
                     }
                 }
 
@@ -35,7 +45,9 @@ public abstract class SendRunnable implements Runnable {
                     buffer.clear();
                     codec.getEncode().encode(data, buffer);
                     buffer.flip();
-                    doSend(buffer.array(), 0, buffer.limit());
+                    if (!doSend(buffer.array(), 0, buffer.limit())) {
+                        Config.getConfig().getLogger().error("数据没有被真正发送出去！");
+                    }
                 }
             }
         }
@@ -49,15 +61,16 @@ public abstract class SendRunnable implements Runnable {
         }
     }
 
-    public void send(Object data) {
+    public boolean send(Object data) {
         if (!sending) {
-            return;
+            return false;
         }
         this.vector.add(data);
         synchronized (this) {
             this.notify();
         }
+        return true;
     }
 
-    protected abstract void doSend(byte[] buffer, int offset, int length);
+    protected abstract boolean doSend(byte[] buffer, int offset, int length);
 }

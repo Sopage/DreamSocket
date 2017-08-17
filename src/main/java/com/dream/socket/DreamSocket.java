@@ -45,12 +45,10 @@ public class DreamSocket extends DreamNetwork {
                         address = new InetSocketAddress(host, port);
                     }
                     socket = new Socket();
-                    socket.setSoTimeout(30 * 1000);
-                    socket.connect(address);
+                    socket.connect(address, 10000);
                     if (socket.isConnected()) {
                         send.setOutputStream(socket.getOutputStream());
-                        this.startSendAndHandler();
-                        this.status(Handle.STATUS_CONNECTED);
+                        this.startSendAndHandler(this);
                         byte[] bytes = new byte[102400];
                         InputStream in = socket.getInputStream();
                         int len;
@@ -74,6 +72,15 @@ public class DreamSocket extends DreamNetwork {
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void onStart(Runnable runnable) {
+        if (runnable instanceof SendRunnable && isConnected()) {
+            this.status(Handle.STATUS_CONNECTED);
+        } else if (runnable instanceof HandleRunnable && isConnected()) {
+
         }
     }
 

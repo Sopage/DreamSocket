@@ -5,15 +5,14 @@ import com.dream.socket.logger.Logger;
 
 public class Config {
 
-    private static Config config;
+    private static Config config = new Config();
+    private Logger logger = new DefaultLogger();
 
-    private Logger logger;
+    public Config(){
+
+    }
 
     public static Config getConfig(){
-        if(config == null){
-            config = new Config();
-            config.logger = new DefaultLogger();
-        }
         return config;
     }
 
