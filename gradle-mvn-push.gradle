@@ -2,7 +2,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false
+    return POM_VERSION_NAME.contains("SNAPSHOT") == false
 }
 
 tasks.withType(JavaCompile) {
@@ -14,14 +14,14 @@ afterEvaluate { project ->
         repositories {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-                pom.groupId = GROUP
+                pom.groupId = POM_GROUP
                 pom.artifactId = POM_ARTIFACT_ID
-                pom.version = VERSION_NAME
-                repository(url: NEXUS_URL) {
-                    authentication(userName: NEXUS_USER_NAME, password: NEXUS_PASSWORD)
+                pom.version = POM_VERSION_NAME
+                repository(url: MAVEN_NEXUS_URL) {
+                    authentication(userName: MAVEN_NEXUS_USERNAME, password: MAVEN_NEXUS_PASSWORD)
                 }
-                snapshotRepository(url: NEXUS_SNAPSHOT_URL) {
-                    authentication(userName: NEXUS_USER_NAME, password: NEXUS_PASSWORD)
+                snapshotRepository(url: MAVEN_NEXUS_SNAPSHOT_URL) {
+                    authentication(userName: MAVEN_NEXUS_USERNAME, password: MAVEN_NEXUS_PASSWORD)
                 }
                 pom.project {
                     name POM_NAME
