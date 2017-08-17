@@ -1,7 +1,18 @@
 # DreamSocket
 Socket连接客户端，精简版本的Netty或者Mina
 ### 使用方式
-`compile 'com.github.spacetimeme:dream-socket:1.0-SNAPSHOT'`
+
+    Gradle:
+    compile 'com.github.spacetimeme:dream-socket:1.0.0'
+    
+    Maven:
+    <dependency>
+      <groupId>com.github.spacetimeme</groupId>
+      <artifactId>dream-socket</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+
 
 [服务端](https://github.com/spacetimeme/IMService)
 

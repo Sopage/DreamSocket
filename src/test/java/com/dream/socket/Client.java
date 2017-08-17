@@ -25,14 +25,14 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
         socket.setHandle(client);
         socket.setCodec(client);
         socket.start();
-        new Thread(()->{
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            socket.stop();
-        }).start();
+//        new Thread(()->{
+//            try {
+//                Thread.sleep(10000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            socket.stop();
+//        }).start();
         for (int i = 1; i < 10; i++) {
             try {
                 Thread.sleep(100);
