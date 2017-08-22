@@ -25,6 +25,7 @@ public class HandleRunnable implements Runnable {
     public void run() {
         synchronized (this) {
             running = true;
+            queue.clear();
             Config.getConfig().getLogger().debug("start 开启接收线程！");
             if (listener != null) {
                 listener.onStart(this);
