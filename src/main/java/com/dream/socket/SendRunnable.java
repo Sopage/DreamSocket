@@ -5,21 +5,21 @@ import com.dream.socket.config.Config;
 import com.dream.socket.listener.OnStartListener;
 
 import java.nio.ByteBuffer;
-import java.util.Vector;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class SendRunnable implements Runnable {
-    private Vector<Object> vector = new Vector<>();
     private Codec codec;
     private boolean sending;
     private OnStartListener listener;
 
     private ByteBuffer buffer = ByteBuffer.allocate(102400);
+    private LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>();
 
     public void setCodec(Codec codec) {
         this.codec = codec;
     }
 
-    public void setOnStartListener(OnStartListener listener){
+    public void setOnStartListener(OnStartListener listener) {
         this.listener = listener;
     }
 
@@ -28,20 +28,15 @@ public abstract class SendRunnable implements Runnable {
         synchronized (this) {
             sending = true;
             Config.getConfig().getLogger().debug("start 开启发送线程！");
-            if(listener != null){
+            if (listener != null) {
                 listener.onStart(this);
             }
-            while (sending) {
-                if (vector.size() == 0) {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException e) {
-                        Config.getConfig().getLogger().error("发送线程等待异常！", e);
+            try {
+                while (sending) {
+                    Object data = queue.take();
+                    if (!sending) {
+                        return;
                     }
-                }
-
-                while (vector.size() > 0) {
-                    Object data = vector.remove(0);
                     buffer.clear();
                     codec.getEncode().encode(data, buffer);
                     buffer.flip();
@@ -49,6 +44,8 @@ public abstract class SendRunnable implements Runnable {
                         Config.getConfig().getLogger().error("数据没有被真正发送出去！");
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         Config.getConfig().getLogger().debug("stop 结束发送线程！");
@@ -56,20 +53,19 @@ public abstract class SendRunnable implements Runnable {
 
     public void stop() {
         sending = false;
-        synchronized (this) {
-            this.notify();
-        }
+        this.send(new Object());
     }
 
     public boolean send(Object data) {
-        if (!sending) {
-            return false;
+        try {
+            if (sending) {
+                this.queue.put(data);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        this.vector.add(data);
-        synchronized (this) {
-            this.notify();
-        }
-        return true;
+        return false;
     }
 
     protected abstract boolean doSend(byte[] buffer, int offset, int length);

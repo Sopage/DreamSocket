@@ -27,7 +27,7 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
         socket.start();
 //        new Thread(()->{
 //            try {
-//                Thread.sleep(10000);
+//                Thread.sleep(3000);
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
@@ -35,7 +35,7 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
 //        }).start();
         for (int i = 1; i < 10; i++) {
             try {
-                Thread.sleep(100);
+//                Thread.sleep(100);
                 socket.send(client.message("I am user 1, index=" + i));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -148,7 +148,7 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
 
     private Packet message(String text) {
         Protobuf.Message message = Protobuf.Message.newBuilder()
-                .setReceiver(2)
+                .setReceiver(101)
                 .setType(Type.MESSAGE_SINGLE)
                 .setContent(ByteString.copyFromUtf8(text)).build();
         return packet(Type.BODY_MESSAGE, message.toByteString());

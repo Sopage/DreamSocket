@@ -4,11 +4,11 @@ import com.dream.socket.codec.Handle;
 import com.dream.socket.config.Config;
 import com.dream.socket.listener.OnStartListener;
 
-import java.util.Vector;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class HandleRunnable implements Runnable {
 
-    private Vector<Object> vector = new Vector<>();
+    private LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>();
     private Handle handle;
     private boolean running;
     private OnStartListener listener;
@@ -17,7 +17,7 @@ public class HandleRunnable implements Runnable {
         this.handle = handle;
     }
 
-    public void setOnStartListener(OnStartListener listener){
+    public void setOnStartListener(OnStartListener listener) {
         this.listener = listener;
     }
 
@@ -26,36 +26,34 @@ public class HandleRunnable implements Runnable {
         synchronized (this) {
             running = true;
             Config.getConfig().getLogger().debug("start 开启接收线程！");
-            if(listener != null){
+            if (listener != null) {
                 listener.onStart(this);
             }
-            while (running) {
-                if (vector.size() == 0) {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException e) {
-                        Config.getConfig().getLogger().error("接收线程等待异常！", e);
+            try {
+                while (running) {
+                    Object data = queue.take();
+                    if (!running) {
+                        return;
                     }
-                }
-
-                while (vector.size() > 0) {
-                    Object data = vector.remove(0);
                     if (handle != null) {
                         handle.onMessage(data);
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         Config.getConfig().getLogger().debug("stop 结束接收线程！");
     }
 
     public boolean put(Object d) {
-        if(running){
-            vector.add(d);
-            synchronized (this) {
-                this.notify();
+        try {
+            if (running) {
+                this.queue.put(d);
+                return true;
             }
-            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }
@@ -68,12 +66,10 @@ public class HandleRunnable implements Runnable {
 
     public void stop() {
         running = false;
-        synchronized (this) {
-            this.notify();
-        }
+        this.put(new Object());
     }
 
-    public boolean handleIsNull(){
+    public boolean handleIsNull() {
         return handle == null;
     }
 }
