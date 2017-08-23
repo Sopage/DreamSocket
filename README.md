@@ -3,13 +3,13 @@ Socket连接客户端，精简版本的Netty或者Mina
 ### 使用方式
 
     Gradle:
-    compile 'com.github.spacetimeme:dream-socket:1.0.0'
+    compile 'com.github.spacetimeme:dream-socket:1.1.1'
     
     Maven:
     <dependency>
       <groupId>com.github.spacetimeme</groupId>
       <artifactId>dream-socket</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.1</version>
     </dependency>
 
 
