@@ -26,7 +26,7 @@ public class HandleRunnable implements Runnable {
         synchronized (this) {
             running = true;
             queue.clear();
-            Config.getConfig().getLogger().debug("start 开启接收线程！");
+            Config.getConfig().getLogger().debug("接收线程 -> 开启");
             if (listener != null) {
                 listener.onStart(this);
             }
@@ -34,7 +34,7 @@ public class HandleRunnable implements Runnable {
                 while (running) {
                     Object data = queue.take();
                     if (!running) {
-                        return;
+                        continue;
                     }
                     if (handle != null) {
                         handle.onMessage(data);
@@ -44,15 +44,13 @@ public class HandleRunnable implements Runnable {
                 e.printStackTrace();
             }
         }
-        Config.getConfig().getLogger().debug("stop 结束接收线程！");
+        Config.getConfig().getLogger().debug("接收线程 -> 结束");
     }
 
     public boolean put(Object d) {
         try {
-            if (running) {
-                this.queue.put(d);
-                return true;
-            }
+            this.queue.put(d);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }

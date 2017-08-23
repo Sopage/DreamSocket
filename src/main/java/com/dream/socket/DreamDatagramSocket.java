@@ -57,8 +57,9 @@ public class DreamDatagramSocket extends DreamNetwork {
                 if (isRunning()) {
                     this.status(Handle.STATUS_FAIL);
                     try {
+                        Config.getConfig().getLogger().warn("6秒好重新开启等待");
                         this.wait(6000);
-                        Config.getConfig().getLogger().error("6秒好重新开启等待");
+                        Config.getConfig().getLogger().info("重新开启等待");
                     } catch (Exception e) {
                         Config.getConfig().getLogger().error("接收数据错误", e);
                     }

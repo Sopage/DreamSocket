@@ -101,7 +101,6 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
     @Override
     public void onStatus(int status) {
         if (status == Handle.STATUS_CONNECTED) {
-            System.out.println("-----> status=" + status);
             socket.send(login());
         }
     }

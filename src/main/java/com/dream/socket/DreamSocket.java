@@ -47,6 +47,7 @@ public class DreamSocket extends DreamNetwork {
                     socket = new Socket();
                     socket.connect(address, 10000);
                     if (socket.isConnected()) {
+                        Config.getConfig().getLogger().info("连接成功");
                         send.setOutputStream(socket.getOutputStream());
                         this.startSendAndHandler(this);
                         byte[] bytes = new byte[102400];
@@ -57,7 +58,7 @@ public class DreamSocket extends DreamNetwork {
                         }
                     }
                 } catch (Exception e) {
-                    Config.getConfig().getLogger().error("连接出现错误", e);
+                    Config.getConfig().getLogger().error("连接错误", e);
                 } finally {
                     try {
                         this.stopSendAndHandler();
@@ -66,8 +67,9 @@ public class DreamSocket extends DreamNetwork {
                             this.status(Handle.STATUS_FAIL);
                             Config.getConfig().getLogger().warn("6秒后尝试重连");
                             this.wait(6000);
+                            Config.getConfig().getLogger().info("开始重连");
                         }
-                    } catch (InterruptedException ie) {
+                    } catch (Exception ie) {
                         Config.getConfig().getLogger().error("重连发生异常", ie);
                     }
                 }

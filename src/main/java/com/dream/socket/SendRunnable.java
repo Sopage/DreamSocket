@@ -28,7 +28,7 @@ public abstract class SendRunnable implements Runnable {
         synchronized (this) {
             sending = true;
             queue.clear();
-            Config.getConfig().getLogger().debug("start 开启发送线程！");
+            Config.getConfig().getLogger().debug("发送线程 -> 开启");
             if (listener != null) {
                 listener.onStart(this);
             }
@@ -36,7 +36,7 @@ public abstract class SendRunnable implements Runnable {
                 while (sending) {
                     Object data = queue.take();
                     if (!sending) {
-                        return;
+                        continue;
                     }
                     buffer.clear();
                     codec.getEncode().encode(data, buffer);
@@ -49,7 +49,7 @@ public abstract class SendRunnable implements Runnable {
                 e.printStackTrace();
             }
         }
-        Config.getConfig().getLogger().debug("stop 结束发送线程！");
+        Config.getConfig().getLogger().debug("发送线程 -> 结束");
     }
 
     public void stop() {
@@ -59,10 +59,8 @@ public abstract class SendRunnable implements Runnable {
 
     public boolean send(Object data) {
         try {
-            if (sending) {
-                this.queue.put(data);
-                return true;
-            }
+            this.queue.put(data);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -20,7 +20,7 @@ public final class SocketSendRunnable extends SendRunnable {
                 out.flush();
                 return true;
             } catch (Exception e) {
-                Config.getConfig().getLogger().error("发送数据异常！", e);
+                Config.getConfig().getLogger().error("数据发送异常！", e);
             }
         } else {
             Config.getConfig().getLogger().warn("发送管道为NULL！");
