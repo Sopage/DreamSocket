@@ -33,7 +33,7 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
 //            }
 //            socket.stop();
 //        }).start();
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i <= 100; i++) {
             try {
 //                Thread.sleep(100);
                 socket.send(client.message("I am user 1, index=" + i));
@@ -117,6 +117,7 @@ public class Client extends Codec<Packet, Packet> implements Handle<Packet> {
                 case Type.BODY_MESSAGE:
                     Protobuf.Message message = Protobuf.Message.parseFrom(body.getContent());
                     System.out.println("onMessage: type=message id=" + body.getId() + " message=" + message.getContent().toStringUtf8());
+                    socket.send(message("我已收到消息 id=" + body.getId()));
                     break;
                 case Type.BODY_LOGIN:
                     Protobuf.Response response = Protobuf.Response.parseFrom(body.getContent());
