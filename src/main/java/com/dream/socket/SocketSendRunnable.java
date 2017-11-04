@@ -1,12 +1,18 @@
 package com.dream.socket;
 
+import com.dream.socket.codec.Encode;
 import com.dream.socket.config.Config;
 
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
-public final class SocketSendRunnable extends SendRunnable {
+public final class SocketSendRunnable<T> extends SendRunnable<T> {
 
     private OutputStream out;
+
+    public SocketSendRunnable(Encode<T> encode) {
+        super(encode);
+    }
 
     public void setOutputStream(OutputStream out) {
         this.out = out;

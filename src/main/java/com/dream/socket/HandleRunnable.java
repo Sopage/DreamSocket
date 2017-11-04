@@ -2,7 +2,6 @@ package com.dream.socket;
 
 import com.dream.socket.codec.Handle;
 import com.dream.socket.config.Config;
-import com.dream.socket.listener.OnStartListener;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -11,14 +10,9 @@ public class HandleRunnable implements Runnable {
     private LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>();
     private Handle handle;
     private boolean running;
-    private OnStartListener listener;
 
-    public void setHandle(Handle handle) {
+    public HandleRunnable(Handle handle) {
         this.handle = handle;
-    }
-
-    public void setOnStartListener(OnStartListener listener) {
-        this.listener = listener;
     }
 
     @Override
@@ -27,9 +21,6 @@ public class HandleRunnable implements Runnable {
             running = true;
             queue.clear();
             Config.getConfig().getLogger().debug("接收线程 -> 开启");
-            if (listener != null) {
-                listener.onStart(this);
-            }
             try {
                 while (running) {
                     Object data = queue.take();
@@ -65,10 +56,5 @@ public class HandleRunnable implements Runnable {
 
     public void stop() {
         running = false;
-        this.put(new Object());
-    }
-
-    public boolean handleIsNull() {
-        return handle == null;
     }
 }

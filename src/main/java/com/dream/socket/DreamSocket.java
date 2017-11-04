@@ -1,129 +1,64 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.Handle;
-import com.dream.socket.config.Config;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+public abstract class DreamSocket {
 
-public class DreamSocket extends DreamNetwork {
+    private ExecutorService pool;
+    private boolean running;
 
-    private SocketSendRunnable send = new SocketSendRunnable();
-    private InetSocketAddress address;
-    private String host;
-    private int port;
-    private Socket socket;
-
-    public void setAddress(String host, int port) {
-        this.host = host;
-        this.port = port;
-        this.address = null;
+    public final boolean start() {
+        if (running) {
+            return false;
+        }
+        if (pool != null) {
+            if (!pool.isShutdown()) {
+                pool.shutdownNow();
+            }
+            pool = null;
+        }
+        pool = Executors.newFixedThreadPool(3);
+        pool.execute(new StartRunnable());
+        running = true;
+        return true;
     }
 
+    public final boolean stop() {
+        if (!running) {
+            return false;
+        }
+        onStop();
+        if (pool != null && !pool.isShutdown()) {
+            pool.shutdownNow();
+        }
+        running = false;
+        return true;
+    }
 
-    @Override
-    public boolean isConnected() {
-        if (socket != null && !socket.isClosed() && socket.isConnected() && isRunning()) {
+    public abstract boolean onStart();
+
+    public abstract boolean onStop();
+
+    public abstract boolean isConnected();
+
+    public class StartRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            onStart();
+        }
+    }
+
+    public boolean isRunning() {
+        return this.running;
+    }
+
+    protected boolean addExecuteRunnable(Runnable runnable){
+        if(pool != null && !pool.isShutdown()){
+            pool.execute(runnable);
             return true;
         }
         return false;
-    }
-
-    @Override
-    public SendRunnable getSendRunnable() {
-        return send;
-    }
-
-    @Override
-    protected void doStartUp() {
-        synchronized (this) {
-            while (isRunning()) {
-                try {
-                    if (address == null) {
-                        address = new InetSocketAddress(host, port);
-                    }
-                    socket = new Socket();
-                    socket.connect(address, 10000);
-                    if (socket.isConnected()) {
-                        Config.getConfig().getLogger().info("连接成功");
-                        send.setOutputStream(socket.getOutputStream());
-                        this.startSendAndHandler(this);
-                        byte[] bytes = new byte[102400];
-                        InputStream in = socket.getInputStream();
-                        int len;
-                        while ((len = in.read(bytes)) > 0) {
-                            this.decode(bytes, 0, len);
-                        }
-                    }
-                } catch (Exception e) {
-                    Config.getConfig().getLogger().error("连接错误", e);
-                } finally {
-                    try {
-                        this.stopSendAndHandler();
-                        socket = null;
-                        if (isRunning()) {
-                            this.status(Handle.STATUS_FAIL);
-                            Config.getConfig().getLogger().warn("6秒后尝试重连");
-                            this.wait(6000);
-                            Config.getConfig().getLogger().info("开始重连");
-                        }
-                    } catch (Exception ie) {
-                        Config.getConfig().getLogger().error("重连发生异常", ie);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onStart(Runnable runnable) {
-        if (runnable instanceof SendRunnable && isConnected()) {
-            this.status(Handle.STATUS_CONNECTED);
-        } else if (runnable instanceof HandleRunnable && isConnected()) {
-
-        }
-    }
-
-    @Override
-    protected void doStop() {
-        if (socket != null) {
-            shutdownInput(socket);
-            shutdownOutput(socket);
-            close(socket);
-            socket = null;
-            this.status(Handle.STATUS_DISCONNECT);
-        }
-    }
-
-    private static void shutdownInput(Socket socket) {
-        if (socket != null && !socket.isInputShutdown()) {
-            try {
-                socket.shutdownInput();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static void shutdownOutput(Socket socket) {
-        if (socket != null && !socket.isOutputShutdown()) {
-            try {
-                socket.shutdownOutput();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static void close(Socket socket) {
-        if (socket != null && !socket.isClosed()) {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

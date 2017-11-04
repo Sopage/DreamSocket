@@ -3,9 +3,8 @@ package com.dream.socket.codec;
 /**
  * 消息处理类
  * 解码后的消息会回调onReceive方法
- * @param <D> 消息对象
  */
-public interface Handle<D> {
+public interface Handle {
 
     /**
      * 连接成功
@@ -24,6 +23,7 @@ public interface Handle<D> {
 
     /**
      * 连接状态回调
+     *
      * @param status 状态
      */
     void onStatus(int status);
@@ -32,8 +32,9 @@ public interface Handle<D> {
      * 消息回调
      * 解码后的消息会回调onReceive方法
      * 请在这里做业务相关的处理，建议单独开个线程处理
+     *
      * @param data 消息
      */
-    void onMessage(D data);
+    void onMessage(Object data);
 
 }

@@ -2,13 +2,13 @@ package com.dream.socket.codec;
 
 import com.dream.socket.HandleRunnable;
 
-public abstract class ByteProcess {
+public abstract class ByteProcess<T> {
 
-    protected Codec codec;
+    protected Decode<T> decode;
     protected HandleRunnable handle;
 
-    public void setCodec(Codec codec) {
-        this.codec = codec;
+    public ByteProcess(Decode<T> decode) {
+        this.decode = decode;
     }
 
     public void setHandle(HandleRunnable handle) {
@@ -23,7 +23,4 @@ public abstract class ByteProcess {
 
     public abstract void reset();
 
-    public boolean codecIsNull() {
-        return codec == null;
-    }
 }

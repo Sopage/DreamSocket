@@ -1,26 +1,20 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.Codec;
+import com.dream.socket.codec.Encode;
 import com.dream.socket.config.Config;
-import com.dream.socket.listener.OnStartListener;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class SendRunnable implements Runnable {
-    private Codec codec;
+public abstract class SendRunnable<T> implements Runnable {
+
     private boolean sending;
-    private OnStartListener listener;
-
+    private Encode<T> encode;
     private ByteBuffer buffer = ByteBuffer.allocate(102400);
-    private LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
 
-    public void setCodec(Codec codec) {
-        this.codec = codec;
-    }
-
-    public void setOnStartListener(OnStartListener listener) {
-        this.listener = listener;
+    public SendRunnable(Encode<T> encode) {
+        this.encode = encode;
     }
 
     @Override
@@ -29,17 +23,14 @@ public abstract class SendRunnable implements Runnable {
             sending = true;
             queue.clear();
             Config.getConfig().getLogger().debug("发送线程 -> 开启");
-            if (listener != null) {
-                listener.onStart(this);
-            }
             try {
                 while (sending) {
-                    Object data = queue.take();
+                    T data = queue.take();
                     if (!sending) {
                         continue;
                     }
                     buffer.clear();
-                    codec.getEncode().encode(data, buffer);
+                    encode.encode(data, buffer);
                     buffer.flip();
                     if (!doSend(buffer.array(), 0, buffer.limit())) {
                         Config.getConfig().getLogger().error("数据没有被真正发送出去！");
@@ -54,10 +45,10 @@ public abstract class SendRunnable implements Runnable {
 
     public void stop() {
         sending = false;
-        this.send(new Object());
+//        this.send(new Object());
     }
 
-    public boolean send(Object data) {
+    public boolean send(T data) {
         try {
             this.queue.put(data);
             return true;

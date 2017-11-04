@@ -27,6 +27,10 @@ public class ByteArrayProcess extends ByteProcess {
      */
     private int cacheLength = 0;
 
+    public ByteArrayProcess(Decode decode) {
+        super(decode);
+    }
+
     @Override
     protected boolean appendCache(byte[] bytes, int offset, int length) {
         Config.getConfig().getLogger().debug(String.format("1.收到数据-> 缓存{length=\"%d\"} 接收{length=\"%d\"}", cacheLength, length));
@@ -53,7 +57,7 @@ public class ByteArrayProcess extends ByteProcess {
         buffer.mark();
         Object data;
         //判断如果ByteBuffer后面有可读数据并且解码一次
-        while (buffer.hasRemaining() && ((data = codec.getDecode().decode(buffer)) != null)) {
+        while (buffer.hasRemaining() && ((data = decode.decode(buffer)) != null)) {
             Config.getConfig().getLogger().debug(String.format("3.成功解码-> Buffer{剩余=\"%d\"}", buffer.remaining()));
             //把解码的数据回调给Handler
             handle.put(data);

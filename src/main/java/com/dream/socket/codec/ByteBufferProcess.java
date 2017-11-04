@@ -4,7 +4,7 @@ import com.dream.socket.config.Config;
 
 import java.nio.ByteBuffer;
 
-public class ByteBufferProcess extends ByteProcess {
+public class ByteBufferProcess<T> extends ByteProcess {
 
     private static int CACHE_BUFFER_LENGTH = 102400;
 
@@ -13,7 +13,8 @@ public class ByteBufferProcess extends ByteProcess {
     //缓存没有被解码的缓冲区
     private final ByteBuffer cache = ByteBuffer.allocate(CACHE_BUFFER_LENGTH);
 
-    public ByteBufferProcess() {
+    public ByteBufferProcess(Decode<T> decode) {
+        super(decode);
         //计算cache buffer数据相关信息
         cache.flip();
     }
@@ -48,7 +49,7 @@ public class ByteBufferProcess extends ByteProcess {
         buffer.mark();
         Object data;
         //判断如果ByteBuffer后面有可读数据并且解码一次
-        while (buffer.hasRemaining() && ((data = codec.getDecode().decode(buffer)) != null)) {
+        while (buffer.hasRemaining() && ((data = this.decode.decode(buffer)) != null)) {
             Config.getConfig().getLogger().debug(String.format("3.成功解码-> Buffer{剩余=\"%d\"}", buffer.remaining()));
             //把解码的数据回调给Handler
             handle.put(data);
