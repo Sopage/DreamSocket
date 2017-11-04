@@ -54,7 +54,7 @@ public abstract class DreamSocket {
         return this.running;
     }
 
-    protected boolean addExecuteRunnable(Runnable runnable){
+    protected boolean executeRunnable(Runnable runnable){
         if(pool != null && !pool.isShutdown()){
             pool.execute(runnable);
             return true;

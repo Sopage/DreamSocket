@@ -1,7 +1,10 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.*;
-import com.dream.socket.config.Config;
+import com.dream.socket.codec.MessageDecode;
+import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.codec.MessageHandle;
+import com.dream.socket.runnable.HandleRunnable;
+import com.dream.socket.runnable.SocketSendRunnable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,29 +14,24 @@ import java.net.Socket;
 public class DreamTCPSocket extends DreamSocket {
 
     private static final int SOCKET_CONNECT_TIMEOUT = 10000;
-    private InetSocketAddress address;
-    private String host;
-    private int port;
-    private Socket socket;
-    private SocketSendRunnable send;
-    private ByteProcess process;
-    private HandleRunnable handle;
+    private InetSocketAddress mAddress;
+    private String mHost;
+    private int mPort;
+    private Socket mSocket;
+    private SocketSendRunnable mSocketSendRunnable;
+    private MessageDecode mMessageDecode;
+    private HandleRunnable mHandleRunnable;
 
-    public DreamTCPSocket(String host, int port){
-        this.host = host;
-        this.port = port;
+    public DreamTCPSocket(String host, int port) {
+        this.mHost = host;
+        this.mPort = port;
     }
 
-    public <T> void setEncode(Encode<T> encode){
-        this.send = new SocketSendRunnable<T>(encode);
-    }
-
-    public <T> void setDecode(Decode<T> decode){
-        this.process = new ByteBufferProcess<T>(decode);
-    }
-
-    public void setHandle(Handle handle){
-        this.handle = new HandleRunnable(handle);
+    public <T> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
+        this.mHandleRunnable = new HandleRunnable<T>(messageHandle);
+        messageDecode.setHandleRunnable(mHandleRunnable);
+        this.mMessageDecode = messageDecode;
+        this.mSocketSendRunnable = new SocketSendRunnable<T>(messageEncode);
     }
 
     @Override
@@ -41,37 +39,36 @@ public class DreamTCPSocket extends DreamSocket {
         synchronized (this) {
             while (isRunning()) {
                 try {
-                    if (address == null) {
-                        address = new InetSocketAddress(host, port);
+                    if (mAddress == null) {
+                        mAddress = new InetSocketAddress(mHost, mPort);
                     }
-                    socket = new Socket();
-                    socket.connect(address, SOCKET_CONNECT_TIMEOUT);
-                    if (socket.isConnected()) {
+                    mSocket = new Socket();
+                    mSocket.connect(mAddress, SOCKET_CONNECT_TIMEOUT);
+                    if (mSocket.isConnected()) {
                         System.out.println("连接成功");
-                        send.setOutputStream(socket.getOutputStream());
-                        addExecuteRunnable(send);
-                        this.process.setHandle(handle);
-                        addExecuteRunnable(handle);
+                        mSocketSendRunnable.setOutputStream(mSocket.getOutputStream());
+                        executeRunnable(mSocketSendRunnable);
+                        executeRunnable(mHandleRunnable);
                         byte[] bytes = new byte[102400];
-                        InputStream in = socket.getInputStream();
+                        InputStream in = mSocket.getInputStream();
                         int length;
                         while ((length = in.read(bytes)) > 0) {
-                            this.process.put(bytes, 0, length);
+                            this.mMessageDecode.put(bytes, 0, length);
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
                     try {
-                        socket = null;
+                        mSocket = null;
                         if (isRunning()) {
-                            this.handle.status(Handle.STATUS_FAIL);
-                            Config.getConfig().getLogger().warn("6秒后尝试重连");
+                            this.mHandleRunnable.status(Status.STATUS_FAIL);
+                            System.out.println("6秒后尝试重连");
                             this.wait(6000);
-                            Config.getConfig().getLogger().info("开始重连");
+                            System.out.println("开始重连");
                         }
                     } catch (Exception ie) {
-                        Config.getConfig().getLogger().error("重连发生异常", ie);
+                        System.out.println("重连发生异常");
                     }
                 }
             }
@@ -79,33 +76,33 @@ public class DreamTCPSocket extends DreamSocket {
         return false;
     }
 
-    public void send(Object data){
-        if(send != null){
-            send.send(data);
+    public void send(Object data) {
+        if (mSocketSendRunnable != null) {
+            mSocketSendRunnable.send(data);
         }
     }
 
     @Override
     public boolean onStop() {
-        if(send != null){
-            send.stop();
+        if (mSocketSendRunnable != null) {
+            mSocketSendRunnable.stop();
         }
-        if(handle != null){
-            handle.stop();
+        if (this.mHandleRunnable != null) {
+            this.mHandleRunnable.stop();
         }
-        if (socket != null) {
-            shutdownInput(socket);
-            shutdownOutput(socket);
-            close(socket);
-            socket = null;
-            handle.status(Handle.STATUS_DISCONNECT);
+        if (mSocket != null) {
+            shutdownInput(mSocket);
+            shutdownOutput(mSocket);
+            close(mSocket);
+            mSocket = null;
+            mHandleRunnable.status(Status.STATUS_DISCONNECT);
         }
         return true;
     }
 
     @Override
     public boolean isConnected() {
-        if (socket != null && !socket.isClosed() && socket.isConnected() && isRunning()) {
+        if (mSocket != null && !mSocket.isClosed() && mSocket.isConnected() && isRunning()) {
             return true;
         }
         return false;

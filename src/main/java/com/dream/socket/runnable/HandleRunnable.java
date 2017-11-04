@@ -1,17 +1,16 @@
-package com.dream.socket;
+package com.dream.socket.runnable;
 
-import com.dream.socket.codec.Handle;
-import com.dream.socket.config.Config;
+import com.dream.socket.codec.MessageHandle;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class HandleRunnable implements Runnable {
+public class HandleRunnable<T> implements Runnable {
 
-    private LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>();
-    private Handle handle;
+    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    private MessageHandle<T> handle;
     private boolean running;
 
-    public HandleRunnable(Handle handle) {
+    public HandleRunnable(MessageHandle<T> handle) {
         this.handle = handle;
     }
 
@@ -20,10 +19,10 @@ public class HandleRunnable implements Runnable {
         synchronized (this) {
             running = true;
             queue.clear();
-            Config.getConfig().getLogger().debug("接收线程 -> 开启");
+            System.out.println("接收线程 -> 开启");
             try {
                 while (running) {
-                    Object data = queue.take();
+                    T data = queue.take();
                     if (!running) {
                         continue;
                     }
@@ -35,10 +34,10 @@ public class HandleRunnable implements Runnable {
                 e.printStackTrace();
             }
         }
-        Config.getConfig().getLogger().debug("接收线程 -> 结束");
+        System.out.println("接收线程 -> 结束");
     }
 
-    public boolean put(Object d) {
+    public boolean put(T d) {
         try {
             this.queue.put(d);
             return true;

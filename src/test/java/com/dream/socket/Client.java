@@ -1,8 +1,8 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.Decode;
-import com.dream.socket.codec.Encode;
-import com.dream.socket.codec.Handle;
+import com.dream.socket.codec.MessageDecode;
+import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.codec.MessageHandle;
 
 import java.nio.ByteBuffer;
 
@@ -11,54 +11,54 @@ public class Client {
     private DreamTCPSocket socket;
 
     public static void main(String[] args) {
-        DreamTCPSocket socket = new DreamTCPSocket("www.oschina.net", 80);
-        socket.setDecode(new Decode<String>() {
+        DreamTCPSocket socket = new DreamTCPSocket("localhost", 6969);
+        socket.codec(new MessageDecode<String>() {
             @Override
-            public String decode(ByteBuffer buffer) {
-                byte[] array = new byte[buffer.limit()];
+            protected String decode(ByteBuffer buffer) {
+                int len = buffer.getInt();
+                if(len > buffer.remaining()){
+                    return null;
+                }
+                byte[] array = new byte[len];
                 buffer.get(array);
-                String s = new String(array);
-                System.out.println(s);
-                return s;
+                return new String(array);
             }
-        });
-        socket.setEncode(new Encode<String>() {
-            @Override
-            public void encode(String data, ByteBuffer buffer) {
-                buffer.put(data.getBytes());
-            }
-        });
-        socket.setHandle(new Handle() {
+        }, new MessageHandle<String>() {
             @Override
             public void onStatus(int status) {
 
             }
 
             @Override
-            public void onMessage(Object data) {
-
+            public void onMessage(String data) {
+                System.out.println(data);
+            }
+        }, new MessageEncode<String>() {
+            @Override
+            public void encode(String data, ByteBuffer buffer) {
+                buffer.put(data.getBytes());
             }
         });
         socket.start();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        StringBuilder writer = new StringBuilder();
-        writer.append("GET / HTTP/1.1\r\n");
-        writer.append("Host: www.oschina.net\r\n");
-        writer.append("Accept-Language: zh-cn\r\n");
-        writer.append("Connection: Keep-Alive\r\n");
-        writer.append("\r\n");
-        socket.send(writer.toString());
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        socket.stop();
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        StringBuilder writer = new StringBuilder();
+//        writer.append("GET / HTTP/1.1\r\n");
+//        writer.append("Host: www.oschina.net\r\n");
+//        writer.append("Accept-Language: zh-cn\r\n");
+//        writer.append("Connection: Keep-Alive\r\n");
+//        writer.append("\r\n");
+//        socket.send(writer.toString());
+//
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        socket.stop();
     }
 //
 //    public void setSocket(DreamTCPSocket socket) {

@@ -1,7 +1,6 @@
-package com.dream.socket;
+package com.dream.socket.runnable;
 
-import com.dream.socket.codec.Encode;
-import com.dream.socket.config.Config;
+import com.dream.socket.codec.MessageEncode;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -9,11 +8,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 public abstract class SendRunnable<T> implements Runnable {
 
     private boolean sending;
-    private Encode<T> encode;
+    private MessageEncode<T> encode;
     private ByteBuffer buffer = ByteBuffer.allocate(102400);
     private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
 
-    public SendRunnable(Encode<T> encode) {
+    public SendRunnable(MessageEncode<T> encode) {
         this.encode = encode;
     }
 
@@ -22,7 +21,7 @@ public abstract class SendRunnable<T> implements Runnable {
         synchronized (this) {
             sending = true;
             queue.clear();
-            Config.getConfig().getLogger().debug("发送线程 -> 开启");
+            System.out.println("发送线程 -> 开启");
             try {
                 while (sending) {
                     T data = queue.take();
@@ -33,19 +32,18 @@ public abstract class SendRunnable<T> implements Runnable {
                     encode.encode(data, buffer);
                     buffer.flip();
                     if (!doSend(buffer.array(), 0, buffer.limit())) {
-                        Config.getConfig().getLogger().error("数据没有被真正发送出去！");
+                        System.out.println("数据没有被真正发送出去！");
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        Config.getConfig().getLogger().debug("发送线程 -> 结束");
+        System.out.println("发送线程 -> 结束");
     }
 
     public void stop() {
         sending = false;
-//        this.send(new Object());
     }
 
     public boolean send(T data) {

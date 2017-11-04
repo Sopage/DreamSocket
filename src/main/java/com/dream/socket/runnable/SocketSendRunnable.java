@@ -1,16 +1,14 @@
-package com.dream.socket;
+package com.dream.socket.runnable;
 
-import com.dream.socket.codec.Encode;
-import com.dream.socket.config.Config;
+import com.dream.socket.codec.MessageEncode;
 
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 
 public final class SocketSendRunnable<T> extends SendRunnable<T> {
 
     private OutputStream out;
 
-    public SocketSendRunnable(Encode<T> encode) {
+    public SocketSendRunnable(MessageEncode<T> encode) {
         super(encode);
     }
 
@@ -26,10 +24,10 @@ public final class SocketSendRunnable<T> extends SendRunnable<T> {
                 out.flush();
                 return true;
             } catch (Exception e) {
-                Config.getConfig().getLogger().error("数据发送异常！", e);
+                System.err.println("数据发送异常！");
             }
         } else {
-            Config.getConfig().getLogger().warn("发送管道为NULL！");
+            System.out.println("发送管道为NULL！");
         }
         return false;
     }
