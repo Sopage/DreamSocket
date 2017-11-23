@@ -4,6 +4,7 @@ import com.dream.socket.codec.MessageDecode;
 import com.dream.socket.codec.MessageEncode;
 import com.dream.socket.codec.MessageHandle;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
@@ -42,10 +43,10 @@ public class UDPClient {
             e.printStackTrace();
         }
         for (int i = 1; i <= 10; i++) {
-            socket.send("localhost", 6969, new StringMessage(("message 6969 -> " + i).getBytes()));
-//            socket.send("localhost", 6960, new StringMessage(("message 6960 -> " + i).getBytes()));
-//            socket.send("localhost", 6961, new StringMessage(("message 6961 -> " + i).getBytes()));
-//            socket.send("localhost", 6962, new StringMessage(("message 6962 -> " + i).getBytes()));
+            socket.send(new InetSocketAddress("localhost", 6969), new StringMessage(("message 6969 -> " + i).getBytes()));
+            socket.send(new InetSocketAddress("localhost", 6960), new StringMessage(("message 6960 -> " + i).getBytes()));
+            socket.send(new InetSocketAddress("localhost", 6961), new StringMessage(("message 6961 -> " + i).getBytes()));
+            socket.send(new InetSocketAddress("localhost", 6962), new StringMessage(("message 6962 -> " + i).getBytes()));
         }
         try {
             Thread.sleep(5000);
