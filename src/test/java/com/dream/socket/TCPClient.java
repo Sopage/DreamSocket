@@ -1,6 +1,5 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.DataProtocol;
 import com.dream.socket.codec.MessageDecode;
 import com.dream.socket.codec.MessageEncode;
 import com.dream.socket.codec.MessageHandle;
@@ -8,62 +7,44 @@ import com.dream.socket.codec.MessageHandle;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
-public class Client {
+public class TCPClient {
 
-    private DreamTCPSocket socket;
-
-    public static final class StringProtocol extends DataProtocol{
-
-        String string;
-
-        public StringProtocol(byte[] array) {
-            string = new String(array);
-        }
-
-        public StringProtocol(byte[] array, int i, int limit) {
-            string = new String(array, i, limit);
-        }
-
-        public String getString() {
-            return string;
-        }
-    }
 
     public static void main(String[] args) {
-        DreamUDPSocket socket = new DreamUDPSocket();
-        socket.codec(new MessageDecode<StringProtocol>() {
+        DreamTCPSocket socket = new DreamTCPSocket("localhost", 6969);
+        socket.codec(new MessageDecode<StringMessage>() {
             @Override
-            protected StringProtocol decode(SocketAddress address, ByteBuffer buffer) {
+            protected StringMessage decode(SocketAddress address, ByteBuffer buffer) {
                 int limit = buffer.limit();
-                byte[] array = new byte[limit];
-                buffer.get(array);
-                return new StringProtocol(array);
+                if(limit < 4){
+                    return null;
+                }
+                int len = buffer.getInt();
+                if(buffer.remaining() >= len){
+                    byte[] array = new byte[len];
+                    buffer.get(array);
+                    return new StringMessage(array);
+                }
+                return null;
             }
-        }, new MessageHandle<StringProtocol>() {
+        }, new MessageHandle<StringMessage>() {
             @Override
             public void onStatus(int status) {
 
             }
 
             @Override
-            public void onMessage(StringProtocol data) {
+            public void onMessage(StringMessage data) {
                 System.out.println(data.getString());
             }
-        }, new MessageEncode<StringProtocol>() {
+        }, new MessageEncode<StringMessage>() {
             @Override
-            public void encode(StringProtocol data, ByteBuffer buffer) {
+            public void encode(StringMessage data, ByteBuffer buffer) {
                 buffer.put(data.getString().getBytes());
             }
         });
         socket.start();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        for(int i=1; i<=10; i++){
-            socket.send("localhost", 6969, new StringProtocol(("message -> " + i).getBytes()));
-        }
+
 //        StringBuilder writer = new StringBuilder();
 //        writer.append("GET / HTTP/1.1\r\n");
 //        writer.append("Host: www.oschina.net\r\n");
@@ -72,12 +53,6 @@ public class Client {
 //        writer.append("\r\n");
 //        socket.send(writer.toString());
 //
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        socket.stop();
     }
 //
 //    public void setSocket(DreamTCPSocket socket) {

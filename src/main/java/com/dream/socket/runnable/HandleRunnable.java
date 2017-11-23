@@ -1,11 +1,13 @@
 package com.dream.socket.runnable;
 
-import com.dream.socket.codec.DataProtocol;
+import com.dream.socket.Status;
+import com.dream.socket.codec.Message;
 import com.dream.socket.codec.MessageHandle;
+import com.dream.socket.logger.LoggerFactory;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class HandleRunnable<T extends DataProtocol> implements Runnable {
+public class HandleRunnable<T extends Message> implements Runnable {
 
     private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private MessageHandle<T> handle;
@@ -20,8 +22,9 @@ public class HandleRunnable<T extends DataProtocol> implements Runnable {
         synchronized (this) {
             running = true;
             queue.clear();
-            System.out.println("接收线程 -> 开启");
+            LoggerFactory.getLogger().info("开启 -> 接收线程");
             try {
+                handle.onStatus(Status.STATUS_CONNECTED);
                 while (running) {
                     T data = queue.take();
                     if (!running) {
@@ -35,7 +38,7 @@ public class HandleRunnable<T extends DataProtocol> implements Runnable {
                 e.printStackTrace();
             }
         }
-        System.out.println("接收线程 -> 结束");
+        LoggerFactory.getLogger().info("结束 -> 接收线程");
     }
 
     public boolean put(T d) {

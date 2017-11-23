@@ -1,13 +1,14 @@
 package com.dream.socket.runnable;
 
-import com.dream.socket.codec.DataProtocol;
+import com.dream.socket.codec.Message;
 import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.logger.LoggerFactory;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class SendRunnable<T extends DataProtocol> implements Runnable {
+public abstract class SendRunnable<T extends Message> implements Runnable {
 
     private boolean sending;
     private MessageEncode<T> encode;
@@ -23,7 +24,7 @@ public abstract class SendRunnable<T extends DataProtocol> implements Runnable {
         synchronized (this) {
             sending = true;
             queue.clear();
-            System.out.println("发送线程 -> 开启");
+            LoggerFactory.getLogger().info("开启 -> 发送线程");
             try {
                 while (sending) {
                     T data = queue.take();
@@ -34,14 +35,14 @@ public abstract class SendRunnable<T extends DataProtocol> implements Runnable {
                     encode.encode(data, buffer);
                     buffer.flip();
                     if (!doSend(data.mAddress, buffer.array(), 0, buffer.limit())) {
-                        System.out.println("数据没有被真正发送出去！");
+                        LoggerFactory.getLogger().error("数据没有被发送出去！");
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("发送线程 -> 结束");
+        LoggerFactory.getLogger().info("结束 -> 发送线程");
     }
 
     public void stop() {

@@ -1,9 +1,10 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.DataProtocol;
+import com.dream.socket.codec.Message;
 import com.dream.socket.codec.MessageDecode;
 import com.dream.socket.codec.MessageEncode;
 import com.dream.socket.codec.MessageHandle;
+import com.dream.socket.logger.LoggerFactory;
 import com.dream.socket.runnable.HandleRunnable;
 import com.dream.socket.runnable.TCPSocketSendRunnable;
 
@@ -29,7 +30,7 @@ public class DreamTCPSocket extends DreamSocket {
         this.mPort = port;
     }
 
-    public <T extends DataProtocol> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
+    public <T extends Message> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
         this.mHandleRunnable = new HandleRunnable<>(messageHandle);
         messageDecode.setHandleRunnable(mHandleRunnable);
         this.mMessageDecode = messageDecode;
@@ -45,9 +46,10 @@ public class DreamTCPSocket extends DreamSocket {
                         mAddress = new InetSocketAddress(mHost, mPort);
                     }
                     mSocket = new Socket();
+                    LoggerFactory.getLogger().info("开始连接 -> " + mAddress.toString());
                     mSocket.connect(mAddress, SOCKET_CONNECT_TIMEOUT);
                     if (mSocket.isConnected()) {
-                        System.out.println("连接成功");
+                        LoggerFactory.getLogger().info("连接成功");
                         mSocketSendRunnable.setOutputStream(mSocket.getOutputStream());
                         executeRunnable(mSocketSendRunnable);
                         executeRunnable(mHandleRunnable);
@@ -55,22 +57,24 @@ public class DreamTCPSocket extends DreamSocket {
                         InputStream in = mSocket.getInputStream();
                         int length;
                         while ((length = in.read(bytes)) > 0) {
-                            this.mMessageDecode.put(mAddress, bytes, 0, length);
+                            this.mMessageDecode.decode(mAddress, bytes, 0, length);
                         }
+                    } else {
+                        LoggerFactory.getLogger().error("连接失败！");
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LoggerFactory.getLogger().error("重连发生异常", e);
                 } finally {
                     try {
                         mSocket = null;
                         if (isRunning()) {
                             this.mHandleRunnable.status(Status.STATUS_FAIL);
-                            System.out.println("6秒后尝试重连");
+                            LoggerFactory.getLogger().info("6秒后尝试重连");
                             this.wait(6000);
-                            System.out.println("开始重连");
+                            LoggerFactory.getLogger().info("开始重连 -> " + mAddress.toString());
                         }
                     } catch (Exception ie) {
-                        System.out.println("重连发生异常");
+                        LoggerFactory.getLogger().error("重连发生异常", ie);
                     }
                 }
             }
@@ -78,7 +82,7 @@ public class DreamTCPSocket extends DreamSocket {
         return false;
     }
 
-    public <T extends DataProtocol> boolean send(T data) {
+    public <T extends Message> boolean send(T data) {
         if (mSocketSendRunnable != null) {
             data.mAddress = mAddress;
             return mSocketSendRunnable.send(data);
@@ -89,9 +93,11 @@ public class DreamTCPSocket extends DreamSocket {
     @Override
     protected boolean onStop() {
         if (mSocketSendRunnable != null) {
+            LoggerFactory.getLogger().info("开始结束发送线程...");
             mSocketSendRunnable.stop();
         }
         if (this.mHandleRunnable != null) {
+            LoggerFactory.getLogger().info("开始结束接收线程...");
             this.mHandleRunnable.stop();
         }
         if (mSocket != null) {
@@ -115,6 +121,7 @@ public class DreamTCPSocket extends DreamSocket {
     private static void shutdownInput(Socket socket) {
         if (socket != null && !socket.isInputShutdown()) {
             try {
+                LoggerFactory.getLogger().info("关闭Socket输入...");
                 socket.shutdownInput();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -125,6 +132,7 @@ public class DreamTCPSocket extends DreamSocket {
     private static void shutdownOutput(Socket socket) {
         if (socket != null && !socket.isOutputShutdown()) {
             try {
+                LoggerFactory.getLogger().info("关闭Socket输出...");
                 socket.shutdownOutput();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -135,6 +143,7 @@ public class DreamTCPSocket extends DreamSocket {
     private static void close(Socket socket) {
         if (socket != null && !socket.isClosed()) {
             try {
+                LoggerFactory.getLogger().info("关闭Socket...");
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();

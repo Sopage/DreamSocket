@@ -1,9 +1,10 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.DataProtocol;
+import com.dream.socket.codec.Message;
 import com.dream.socket.codec.MessageDecode;
 import com.dream.socket.codec.MessageEncode;
 import com.dream.socket.codec.MessageHandle;
+import com.dream.socket.logger.LoggerFactory;
 import com.dream.socket.runnable.HandleRunnable;
 import com.dream.socket.runnable.UDPSocketSendRunnable;
 
@@ -19,7 +20,7 @@ public class DreamUDPSocket extends DreamSocket {
     private MessageDecode mMessageDecode;
     private HandleRunnable mHandleRunnable;
 
-    public <T extends DataProtocol> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
+    public <T extends Message> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
         this.mHandleRunnable = new HandleRunnable<>(messageHandle);
         messageDecode.setHandleRunnable(mHandleRunnable);
         this.mMessageDecode = messageDecode;
@@ -30,9 +31,10 @@ public class DreamUDPSocket extends DreamSocket {
     public boolean onStart() {
         synchronized (this) {
             try {
+                LoggerFactory.getLogger().info("开始创建UDP管道");
                 mSocket = new DatagramSocket();
             } catch (Exception e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("UDP管道创建失败！", e);
                 return false;
             }
             mSocketSendRunnable.setDatagramSocket(mSocket);
@@ -44,21 +46,20 @@ public class DreamUDPSocket extends DreamSocket {
                 while (isRunning()) {
                     packet.setData(buffer, 0, buffer.length);
                     mSocket.receive(packet);
-                    mMessageDecode.put(packet.getSocketAddress(), packet.getData(), packet.getOffset(), packet.getLength());
+                    mMessageDecode.decode(packet.getSocketAddress(), packet.getData(), packet.getOffset(), packet.getLength());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("UDP receive执行异常！", e);
             } finally {
                 try {
                     mSocket = null;
                     if (isRunning()) {
                         this.mHandleRunnable.status(Status.STATUS_FAIL);
-                        System.out.println("6秒后尝试重连");
+                        LoggerFactory.getLogger().info("6秒后重新创建UDP管道");
                         this.wait(6000);
-                        System.out.println("开始重连");
                     }
                 } catch (Exception ie) {
-                    System.out.println("重连发生异常");
+                    LoggerFactory.getLogger().error("wait奔溃！", ie);
                 }
             }
 
@@ -69,12 +70,15 @@ public class DreamUDPSocket extends DreamSocket {
     @Override
     public boolean onStop() {
         if (mSocketSendRunnable != null) {
+            LoggerFactory.getLogger().info("开始结束发送线程...");
             mSocketSendRunnable.stop();
         }
         if (this.mHandleRunnable != null) {
+            LoggerFactory.getLogger().info("开始结束接收线程...");
             this.mHandleRunnable.stop();
         }
         if (mSocket != null) {
+            LoggerFactory.getLogger().info("关闭UDP管道");
             mSocket.close();
             mSocket = null;
             mHandleRunnable.status(Status.STATUS_DISCONNECT);
@@ -90,7 +94,7 @@ public class DreamUDPSocket extends DreamSocket {
         return false;
     }
 
-    public boolean send(String host, int port, DataProtocol data) {
+    public boolean send(String host, int port, Message data) {
         if (mSocketSendRunnable != null) {
             SocketAddress address = new InetSocketAddress(host, port);
             data.mAddress = address;

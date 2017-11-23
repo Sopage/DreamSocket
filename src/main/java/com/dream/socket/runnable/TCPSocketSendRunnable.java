@@ -1,12 +1,13 @@
 package com.dream.socket.runnable;
 
-import com.dream.socket.codec.DataProtocol;
+import com.dream.socket.codec.Message;
 import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.logger.LoggerFactory;
 
 import java.io.OutputStream;
 import java.net.SocketAddress;
 
-public final class TCPSocketSendRunnable<T extends DataProtocol> extends SendRunnable<T> {
+public final class TCPSocketSendRunnable<T extends Message> extends SendRunnable<T> {
 
     private OutputStream out;
 
@@ -26,10 +27,10 @@ public final class TCPSocketSendRunnable<T extends DataProtocol> extends SendRun
                 out.flush();
                 return true;
             } catch (Exception e) {
-                System.err.println("数据发送异常！");
+                LoggerFactory.getLogger().error("数据发送异常！", e);
             }
         } else {
-            System.out.println("发送管道为NULL！");
+            LoggerFactory.getLogger().error("发送管道OutputStream为NULL！");
         }
         return false;
     }

@@ -1,17 +1,19 @@
 package com.dream.socket.runnable;
 
-import com.dream.socket.codec.DataProtocol;
+import com.dream.socket.codec.Message;
 import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.logger.LoggerFactory;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 
-public class UDPSocketSendRunnable<T extends DataProtocol> extends SendRunnable<T> {
+public class UDPSocketSendRunnable<T extends Message> extends SendRunnable<T> {
 
     private DatagramSocket mSocket;
     private DatagramPacket packet;
+
     public UDPSocketSendRunnable(MessageEncode<T> encode) {
         super(encode);
     }
@@ -24,7 +26,7 @@ public class UDPSocketSendRunnable<T extends DataProtocol> extends SendRunnable<
     protected boolean doSend(SocketAddress address, byte[] buffer, int offset, int length) {
         if (mSocket != null) {
             try {
-                if(packet == null){
+                if (packet == null) {
                     packet = new DatagramPacket(buffer, buffer.length);
                 }
                 packet.setData(buffer, offset, length);
@@ -32,8 +34,10 @@ public class UDPSocketSendRunnable<T extends DataProtocol> extends SendRunnable<
                 mSocket.send(packet);
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("数据发送异常！", e);
             }
+        } else {
+            LoggerFactory.getLogger().error("发送管道DatagramSocket为NULL！");
         }
         return false;
     }

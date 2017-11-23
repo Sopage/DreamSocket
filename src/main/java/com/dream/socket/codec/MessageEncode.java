@@ -2,7 +2,7 @@ package com.dream.socket.codec;
 
 import java.nio.ByteBuffer;
 
-public abstract class MessageEncode<T extends DataProtocol> {
+public abstract class MessageEncode<T extends Message> {
 
 
     /**
