@@ -1,12 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'maven'
-//apply from: 'gradle-mvn-push.gradle'
+apply from: 'gradle-mvn-push.gradle'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile "com.google.protobuf:protobuf-java:3.3.1"
 }

@@ -94,9 +94,8 @@ public class DreamUDPSocket extends DreamSocket {
         return false;
     }
 
-    public boolean send(String host, int port, Message data) {
+    public boolean send(SocketAddress address, Message data) {
         if (mSocketSendRunnable != null) {
-            SocketAddress address = new InetSocketAddress(host, port);
             data.mAddress = address;
             mSocketSendRunnable.send(data);
             return true;

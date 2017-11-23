@@ -2,20 +2,20 @@
 Socket连接客户端，精简版本的Netty或者Mina
 ### 使用方式
 
-    Gradle:
-    compile 'com.github.spacetimeme:dream-socket:1.1.1'
+Gradle
+
+    compile 'com.github.spacetimeme:dream-socket:2.0.0'
     
-    Maven:
+Maven
+
     <dependency>
       <groupId>com.github.spacetimeme</groupId>
       <artifactId>dream-socket</artifactId>
-      <version>1.1.1</version>
+      <version>2.0.0</version>
     </dependency>
+    
+[TCP Server](https://github.com/spacetimeme/DreamSocket/blob/master/src/test/java/com/dream/socket/TCPServer.java)
+[TCP使用方式](https://github.com/spacetimeme/DreamSocket/blob/master/src/test/java/com/dream/socket/TCPClient.java)
 
-
-
-[服务端](https://github.com/spacetimeme/IMService)
-
-[TCP使用方式](https://github.com/spacetimeme/DreamSocket/blob/master/src/test/java/com/dream/socket/Client.java)
-
-[UCP使用方式](https://github.com/spacetimeme/DreamSocket/blob/master/src/test/java/com/dream/socket/UDPClient.java)
+[UDP Server](https://github.com/spacetimeme/DreamSocket/blob/master/src/test/java/com/dream/socket/UDPServer.java)
+[UDP使用方式](https://github.com/spacetimeme/DreamSocket/blob/master/src/test/java/com/dream/socket/UDPClient.java)
