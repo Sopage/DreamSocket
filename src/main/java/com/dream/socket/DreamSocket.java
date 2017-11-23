@@ -26,13 +26,13 @@ public abstract class DreamSocket {
 
     public final boolean stop() {
         if (!running) {
-            return false;
+            return true;
         }
+        running = false;
         onStop();
         if (pool != null && !pool.isShutdown()) {
             pool.shutdownNow();
         }
-        running = false;
         return true;
     }
 

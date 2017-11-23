@@ -20,21 +20,22 @@ public class Client {
             string = new String(array);
         }
 
+        public StringProtocol(byte[] array, int i, int limit) {
+            string = new String(array, i, limit);
+        }
+
         public String getString() {
             return string;
         }
     }
 
     public static void main(String[] args) {
-        DreamUDPSocket socket = new DreamUDPSocket(6969);
+        DreamUDPSocket socket = new DreamUDPSocket();
         socket.codec(new MessageDecode<StringProtocol>() {
             @Override
             protected StringProtocol decode(SocketAddress address, ByteBuffer buffer) {
-                int len = buffer.getInt();
-                if(len > buffer.remaining()){
-                    return null;
-                }
-                byte[] array = new byte[len];
+                int limit = buffer.limit();
+                byte[] array = new byte[limit];
                 buffer.get(array);
                 return new StringProtocol(array);
             }
@@ -55,11 +56,14 @@ public class Client {
             }
         });
         socket.start();
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        for(int i=1; i<=10; i++){
+            socket.send("localhost", 6969, new StringProtocol(("message -> " + i).getBytes()));
+        }
 //        StringBuilder writer = new StringBuilder();
 //        writer.append("GET / HTTP/1.1\r\n");
 //        writer.append("Host: www.oschina.net\r\n");
@@ -68,12 +72,12 @@ public class Client {
 //        writer.append("\r\n");
 //        socket.send(writer.toString());
 //
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        socket.stop();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        socket.stop();
     }
 //
 //    public void setSocket(DreamTCPSocket socket) {

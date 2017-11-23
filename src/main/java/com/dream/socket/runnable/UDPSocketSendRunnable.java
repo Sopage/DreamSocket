@@ -1,8 +1,7 @@
-package com.dream.socket;
+package com.dream.socket.runnable;
 
 import com.dream.socket.codec.DataProtocol;
 import com.dream.socket.codec.MessageEncode;
-import com.dream.socket.runnable.SendRunnable;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -12,7 +11,7 @@ import java.net.SocketAddress;
 public class UDPSocketSendRunnable<T extends DataProtocol> extends SendRunnable<T> {
 
     private DatagramSocket mSocket;
-
+    private DatagramPacket packet;
     public UDPSocketSendRunnable(MessageEncode<T> encode) {
         super(encode);
     }
@@ -25,7 +24,12 @@ public class UDPSocketSendRunnable<T extends DataProtocol> extends SendRunnable<
     protected boolean doSend(SocketAddress address, byte[] buffer, int offset, int length) {
         if (mSocket != null) {
             try {
-                mSocket.send(new DatagramPacket(buffer, offset, length, address));
+                if(packet == null){
+                    packet = new DatagramPacket(buffer, buffer.length);
+                }
+                packet.setData(buffer, offset, length);
+                packet.setSocketAddress(address);
+                mSocket.send(packet);
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();

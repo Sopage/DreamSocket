@@ -5,23 +5,19 @@ import com.dream.socket.codec.MessageDecode;
 import com.dream.socket.codec.MessageEncode;
 import com.dream.socket.codec.MessageHandle;
 import com.dream.socket.runnable.HandleRunnable;
+import com.dream.socket.runnable.UDPSocketSendRunnable;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 public class DreamUDPSocket extends DreamSocket {
 
-    private int mPort;
     private DatagramSocket mSocket;
     private UDPSocketSendRunnable mSocketSendRunnable;
-    private DatagramPacket packet;
     private MessageDecode mMessageDecode;
     private HandleRunnable mHandleRunnable;
-
-    public DreamUDPSocket(int port) {
-        this.mPort = port;
-        packet = new DatagramPacket(new byte[500], 500);
-    }
 
     public <T extends DataProtocol> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
         this.mHandleRunnable = new HandleRunnable<>(messageHandle);
@@ -34,7 +30,7 @@ public class DreamUDPSocket extends DreamSocket {
     public boolean onStart() {
         synchronized (this) {
             try {
-                mSocket = new DatagramSocket(mPort);
+                mSocket = new DatagramSocket();
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -42,26 +38,30 @@ public class DreamUDPSocket extends DreamSocket {
             mSocketSendRunnable.setDatagramSocket(mSocket);
             executeRunnable(mSocketSendRunnable);
             executeRunnable(mHandleRunnable);
-            while (isConnected()) {
-                try {
+            byte[] buffer = new byte[500];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            try {
+                while (isRunning()) {
+                    packet.setData(buffer, 0, buffer.length);
                     mSocket.receive(packet);
                     mMessageDecode.put(packet.getSocketAddress(), packet.getData(), packet.getOffset(), packet.getLength());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        mSocket = null;
-                        if (isRunning()) {
-                            this.mHandleRunnable.status(Status.STATUS_FAIL);
-                            System.out.println("6秒后尝试重连");
-                            this.wait(6000);
-                            System.out.println("开始重连");
-                        }
-                    } catch (Exception ie) {
-                        System.out.println("重连发生异常");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    mSocket = null;
+                    if (isRunning()) {
+                        this.mHandleRunnable.status(Status.STATUS_FAIL);
+                        System.out.println("6秒后尝试重连");
+                        this.wait(6000);
+                        System.out.println("开始重连");
                     }
+                } catch (Exception ie) {
+                    System.out.println("重连发生异常");
                 }
             }
+
         }
         return false;
     }
@@ -90,7 +90,13 @@ public class DreamUDPSocket extends DreamSocket {
         return false;
     }
 
-    public boolean send(String host, int port, Object data) {
+    public boolean send(String host, int port, DataProtocol data) {
+        if (mSocketSendRunnable != null) {
+            SocketAddress address = new InetSocketAddress(host, port);
+            data.mAddress = address;
+            mSocketSendRunnable.send(data);
+            return true;
+        }
         return false;
     }
 }
