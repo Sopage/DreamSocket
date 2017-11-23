@@ -1,14 +1,16 @@
 package com.dream.socket.runnable;
 
+import com.dream.socket.codec.DataProtocol;
 import com.dream.socket.codec.MessageEncode;
 
 import java.io.OutputStream;
+import java.net.SocketAddress;
 
-public final class SocketSendRunnable<T> extends SendRunnable<T> {
+public final class TCPSocketSendRunnable<T extends DataProtocol> extends SendRunnable<T> {
 
     private OutputStream out;
 
-    public SocketSendRunnable(MessageEncode<T> encode) {
+    public TCPSocketSendRunnable(MessageEncode<T> encode) {
         super(encode);
     }
 
@@ -17,7 +19,7 @@ public final class SocketSendRunnable<T> extends SendRunnable<T> {
     }
 
     @Override
-    protected boolean doSend(byte[] buffer, int offset, int length) {
+    protected boolean doSend(SocketAddress address, byte[] buffer, int offset, int length) {
         if (out != null) {
             try {
                 out.write(buffer, offset, length);

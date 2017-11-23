@@ -36,9 +36,9 @@ public abstract class DreamSocket {
         return true;
     }
 
-    public abstract boolean onStart();
+    protected abstract boolean onStart();
 
-    public abstract boolean onStop();
+    protected abstract boolean onStop();
 
     public abstract boolean isConnected();
 

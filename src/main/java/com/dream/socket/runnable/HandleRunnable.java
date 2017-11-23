@@ -1,10 +1,11 @@
 package com.dream.socket.runnable;
 
+import com.dream.socket.codec.DataProtocol;
 import com.dream.socket.codec.MessageHandle;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class HandleRunnable<T> implements Runnable {
+public class HandleRunnable<T extends DataProtocol> implements Runnable {
 
     private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private MessageHandle<T> handle;

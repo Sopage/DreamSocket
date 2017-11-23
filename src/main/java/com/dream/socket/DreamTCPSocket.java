@@ -1,24 +1,26 @@
 package com.dream.socket;
 
+import com.dream.socket.codec.DataProtocol;
 import com.dream.socket.codec.MessageDecode;
 import com.dream.socket.codec.MessageEncode;
 import com.dream.socket.codec.MessageHandle;
 import com.dream.socket.runnable.HandleRunnable;
-import com.dream.socket.runnable.SocketSendRunnable;
+import com.dream.socket.runnable.TCPSocketSendRunnable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 public class DreamTCPSocket extends DreamSocket {
 
     private static final int SOCKET_CONNECT_TIMEOUT = 10000;
-    private InetSocketAddress mAddress;
+    private SocketAddress mAddress;
     private String mHost;
     private int mPort;
     private Socket mSocket;
-    private SocketSendRunnable mSocketSendRunnable;
+    private TCPSocketSendRunnable mSocketSendRunnable;
     private MessageDecode mMessageDecode;
     private HandleRunnable mHandleRunnable;
 
@@ -27,15 +29,15 @@ public class DreamTCPSocket extends DreamSocket {
         this.mPort = port;
     }
 
-    public <T> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
-        this.mHandleRunnable = new HandleRunnable<T>(messageHandle);
+    public <T extends DataProtocol> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
+        this.mHandleRunnable = new HandleRunnable<>(messageHandle);
         messageDecode.setHandleRunnable(mHandleRunnable);
         this.mMessageDecode = messageDecode;
-        this.mSocketSendRunnable = new SocketSendRunnable<T>(messageEncode);
+        this.mSocketSendRunnable = new TCPSocketSendRunnable<>(messageEncode);
     }
 
     @Override
-    public boolean onStart() {
+    protected boolean onStart() {
         synchronized (this) {
             while (isRunning()) {
                 try {
@@ -53,7 +55,7 @@ public class DreamTCPSocket extends DreamSocket {
                         InputStream in = mSocket.getInputStream();
                         int length;
                         while ((length = in.read(bytes)) > 0) {
-                            this.mMessageDecode.put(bytes, 0, length);
+                            this.mMessageDecode.put(mAddress, bytes, 0, length);
                         }
                     }
                 } catch (Exception e) {
@@ -76,14 +78,16 @@ public class DreamTCPSocket extends DreamSocket {
         return false;
     }
 
-    public void send(Object data) {
+    public <T extends DataProtocol> boolean send(T data) {
         if (mSocketSendRunnable != null) {
-            mSocketSendRunnable.send(data);
+            data.mAddress = mAddress;
+            return mSocketSendRunnable.send(data);
         }
+        return false;
     }
 
     @Override
-    public boolean onStop() {
+    protected boolean onStop() {
         if (mSocketSendRunnable != null) {
             mSocketSendRunnable.stop();
         }

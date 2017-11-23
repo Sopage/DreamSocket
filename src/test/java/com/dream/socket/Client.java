@@ -1,42 +1,57 @@
 package com.dream.socket;
 
+import com.dream.socket.codec.DataProtocol;
 import com.dream.socket.codec.MessageDecode;
 import com.dream.socket.codec.MessageEncode;
 import com.dream.socket.codec.MessageHandle;
 
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
 public class Client {
 
     private DreamTCPSocket socket;
 
+    public static final class StringProtocol extends DataProtocol{
+
+        String string;
+
+        public StringProtocol(byte[] array) {
+            string = new String(array);
+        }
+
+        public String getString() {
+            return string;
+        }
+    }
+
     public static void main(String[] args) {
-        DreamTCPSocket socket = new DreamTCPSocket("localhost", 6969);
-        socket.codec(new MessageDecode<String>() {
+        DreamUDPSocket socket = new DreamUDPSocket(6969);
+        socket.codec(new MessageDecode<StringProtocol>() {
             @Override
-            protected String decode(ByteBuffer buffer) {
+            protected StringProtocol decode(SocketAddress address, ByteBuffer buffer) {
                 int len = buffer.getInt();
                 if(len > buffer.remaining()){
                     return null;
                 }
                 byte[] array = new byte[len];
                 buffer.get(array);
-                return new String(array);
+                return new StringProtocol(array);
             }
-        }, new MessageHandle<String>() {
+        }, new MessageHandle<StringProtocol>() {
             @Override
             public void onStatus(int status) {
 
             }
 
             @Override
-            public void onMessage(String data) {
-                System.out.println(data);
+            public void onMessage(StringProtocol data) {
+                System.out.println(data.getString());
             }
-        }, new MessageEncode<String>() {
+        }, new MessageEncode<StringProtocol>() {
             @Override
-            public void encode(String data, ByteBuffer buffer) {
-                buffer.put(data.getBytes());
+            public void encode(StringProtocol data, ByteBuffer buffer) {
+                buffer.put(data.getString().getBytes());
             }
         });
         socket.start();

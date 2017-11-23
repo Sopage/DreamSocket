@@ -1,11 +1,13 @@
 package com.dream.socket.runnable;
 
+import com.dream.socket.codec.DataProtocol;
 import com.dream.socket.codec.MessageEncode;
 
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class SendRunnable<T> implements Runnable {
+public abstract class SendRunnable<T extends DataProtocol> implements Runnable {
 
     private boolean sending;
     private MessageEncode<T> encode;
@@ -31,7 +33,7 @@ public abstract class SendRunnable<T> implements Runnable {
                     buffer.clear();
                     encode.encode(data, buffer);
                     buffer.flip();
-                    if (!doSend(buffer.array(), 0, buffer.limit())) {
+                    if (!doSend(data.mAddress, buffer.array(), 0, buffer.limit())) {
                         System.out.println("数据没有被真正发送出去！");
                     }
                 }
@@ -48,13 +50,15 @@ public abstract class SendRunnable<T> implements Runnable {
 
     public boolean send(T data) {
         try {
-            this.queue.put(data);
-            return true;
+            if (sending) {
+                this.queue.put(data);
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    protected abstract boolean doSend(byte[] buffer, int offset, int length);
+    protected abstract boolean doSend(SocketAddress address, byte[] buffer, int offset, int length);
 }

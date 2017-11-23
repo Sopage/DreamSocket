@@ -1,6 +1,6 @@
 package com.dream.socket.codec;
 
-public abstract class MessageHandle<T> {
+public abstract class MessageHandle<T extends DataProtocol> {
 
     /**
      * 连接状态回调
