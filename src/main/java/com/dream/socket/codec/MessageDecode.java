@@ -18,7 +18,7 @@ public abstract class MessageDecode<T extends Message> {
         this.mHandleRunnable = handleRunnable;
     }
 
-    public synchronized void decode(SocketAddress address, byte[] array, int offset, int length) {
+    public final void decode(SocketAddress address, byte[] array, int offset, int length) {
         ByteBuffer buffer = mAddressByteBufferMap.get(address);
         if (buffer == null) {
             buffer = ByteBuffer.allocate(CACHE_BUFFER_LENGTH);
@@ -49,6 +49,7 @@ public abstract class MessageDecode<T extends Message> {
         }
         LoggerFactory.getLogger().info(address.toString() + " 退出解码");
         buffer.reset();
+        LoggerFactory.getLogger().info(String.format("%s 未解码数据 position=%d limit=%d", address.toString(), buffer.position(), buffer.limit()));
     }
 
     protected abstract T decode(SocketAddress address, ByteBuffer buffer);
