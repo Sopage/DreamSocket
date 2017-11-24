@@ -63,7 +63,7 @@ public class DreamTCPSocket extends DreamSocket {
                         LoggerFactory.getLogger().error("连接失败！");
                     }
                 } catch (Exception e) {
-                    LoggerFactory.getLogger().error("重连发生异常", e);
+                    LoggerFactory.getLogger().error("连接异常", e);
                 } finally {
                     try {
                         mSocket = null;
@@ -74,7 +74,7 @@ public class DreamTCPSocket extends DreamSocket {
                             LoggerFactory.getLogger().info("开始重连 -> " + mAddress.toString());
                         }
                     } catch (Exception ie) {
-                        LoggerFactory.getLogger().error("重连发生异常", ie);
+                        LoggerFactory.getLogger().error("wait异常", ie);
                     }
                 }
             }
