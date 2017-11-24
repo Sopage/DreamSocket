@@ -59,5 +59,6 @@ public class HandleRunnable<T extends Message> implements Runnable {
 
     public void stop() {
         running = false;
+        put((T) new Message(){});
     }
 }

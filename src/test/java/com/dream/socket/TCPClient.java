@@ -54,5 +54,11 @@ public class TCPClient {
             }
         });
         socket.start();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        socket.stop();
     }
 }

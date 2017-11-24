@@ -47,14 +47,13 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
 
     public void stop() {
         sending = false;
+        send((T) new Message(){});
     }
 
     public boolean send(T data) {
         try {
-            if (sending) {
-                this.queue.put(data);
-                return true;
-            }
+            this.queue.put(data);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
