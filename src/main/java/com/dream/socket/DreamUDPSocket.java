@@ -69,20 +69,16 @@ public class DreamUDPSocket extends DreamSocket {
 
     @Override
     public boolean onStop() {
-        if (mSocketSendRunnable != null) {
-            LoggerFactory.getLogger().info("开始结束发送线程...");
-            mSocketSendRunnable.stop();
-        }
-        if (this.mHandleRunnable != null) {
-            LoggerFactory.getLogger().info("开始结束接收线程...");
-            this.mHandleRunnable.stop();
-        }
         if (mSocket != null) {
             LoggerFactory.getLogger().info("关闭UDP管道");
             mSocket.close();
             mSocket = null;
-            mHandleRunnable.status(Status.STATUS_DISCONNECT);
+            if (mHandleRunnable != null) {
+                mHandleRunnable.status(Status.STATUS_DISCONNECT);
+            }
         }
+        mSocketSendRunnable = null;
+        mHandleRunnable = null;
         return true;
     }
 

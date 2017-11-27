@@ -10,7 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class SendRunnable<T extends Message> implements Runnable {
 
-    private boolean sending;
     private MessageEncode<T> encode;
     private ByteBuffer buffer = ByteBuffer.allocate(102400);
     private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
@@ -22,15 +21,11 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
     @Override
     public void run() {
         synchronized (this) {
-            sending = true;
             queue.clear();
             LoggerFactory.getLogger().info("开启 -> 发送线程");
             try {
-                while (sending) {
+                while (true) {
                     T data = queue.take();
-                    if (!sending) {
-                        continue;
-                    }
                     buffer.clear();
                     encode.encode(data, buffer);
                     buffer.flip();
@@ -43,11 +38,6 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
             }
         }
         LoggerFactory.getLogger().info("结束 -> 发送线程");
-    }
-
-    public void stop() {
-        sending = false;
-        send((T) new Message(){});
     }
 
     public boolean send(T data) {

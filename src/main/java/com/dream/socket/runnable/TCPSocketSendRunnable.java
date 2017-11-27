@@ -34,10 +34,4 @@ public final class TCPSocketSendRunnable<T extends Message> extends SendRunnable
         }
         return false;
     }
-
-    @Override
-    public void stop() {
-        out = null;
-        super.stop();
-    }
 }

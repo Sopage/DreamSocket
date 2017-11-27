@@ -92,21 +92,17 @@ public class DreamTCPSocket extends DreamSocket {
 
     @Override
     protected boolean onStop() {
-        if (mSocketSendRunnable != null) {
-            LoggerFactory.getLogger().info("开始结束发送线程...");
-            mSocketSendRunnable.stop();
-        }
-        if (this.mHandleRunnable != null) {
-            LoggerFactory.getLogger().info("开始结束接收线程...");
-            this.mHandleRunnable.stop();
-        }
         if (mSocket != null) {
             shutdownInput(mSocket);
             shutdownOutput(mSocket);
             close(mSocket);
             mSocket = null;
-            mHandleRunnable.status(Status.STATUS_DISCONNECT);
+            if (mHandleRunnable != null) {
+                mHandleRunnable.status(Status.STATUS_DISCONNECT);
+            }
         }
+        mSocketSendRunnable = null;
+        mHandleRunnable = null;
         return true;
     }
 

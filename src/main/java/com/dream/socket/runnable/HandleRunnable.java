@@ -11,7 +11,6 @@ public class HandleRunnable<T extends Message> implements Runnable {
 
     private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private MessageHandle<T> handle;
-    private boolean running;
 
     public HandleRunnable(MessageHandle<T> handle) {
         this.handle = handle;
@@ -20,16 +19,12 @@ public class HandleRunnable<T extends Message> implements Runnable {
     @Override
     public void run() {
         synchronized (this) {
-            running = true;
             queue.clear();
             LoggerFactory.getLogger().info("开启 -> 接收线程");
             try {
                 handle.onStatus(Status.STATUS_CONNECTED);
-                while (running) {
+                while (true) {
                     T data = queue.take();
-                    if (!running) {
-                        continue;
-                    }
                     if (handle != null) {
                         handle.onMessage(data);
                     }
@@ -55,10 +50,5 @@ public class HandleRunnable<T extends Message> implements Runnable {
         if (handle != null) {
             handle.onStatus(status);
         }
-    }
-
-    public void stop() {
-        running = false;
-        put((T) new Message(){});
     }
 }
