@@ -28,7 +28,6 @@ public abstract class MessageDecode<T extends Message> {
         }
         LoggerFactory.getLogger().info(String.format("%s 上次未解码 position=%d limit=%d", address.toString(), buffer.position(), buffer.limit()));
         if (buffer.limit() + length > buffer.capacity()) {
-            //TODO 缓存区已满，丢弃读取的数据
             LoggerFactory.getLogger().warn(address.toString() + " -> decode缓存区已满，读取的数据被丢弃!!!!!");
             return;
         }
@@ -41,7 +40,7 @@ public abstract class MessageDecode<T extends Message> {
         LoggerFactory.getLogger().info(address.toString() + " 开始解码数据");
         while (buffer.hasRemaining() && ((data = decode(address, buffer)) != null)) {
             LoggerFactory.getLogger().info(address.toString() + " 成功解码一条数据");
-            data.mAddress = address;
+            data.setRemoteAddress(address);
             mHandleRunnable.put(data);
             buffer.compact();
             buffer.flip();

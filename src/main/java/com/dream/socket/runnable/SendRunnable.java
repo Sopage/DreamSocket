@@ -13,6 +13,7 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
     private MessageEncode<T> encode;
     private ByteBuffer buffer = ByteBuffer.allocate(102400);
     private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    private boolean isSend = false;
 
     public SendRunnable(MessageEncode<T> encode) {
         this.encode = encode;
@@ -20,24 +21,28 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
 
     @Override
     public void run() {
-        synchronized (this) {
-            queue.clear();
-            LoggerFactory.getLogger().info("开启 -> 发送线程");
+        LoggerFactory.getLogger().info("开启 -> 发送线程");
+        isSend = true;
+        while (isSend) {
             try {
-                while (true) {
-                    T data = queue.take();
-                    buffer.clear();
-                    encode.encode(data, buffer);
-                    buffer.flip();
-                    if (!doSend(data.mAddress, buffer.array(), 0, buffer.limit())) {
-                        LoggerFactory.getLogger().error("数据没有被发送出去！");
-                    }
-                }
+                sending();
             } catch (Exception e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("异常 -> 发送线程异常退出", e);
             }
         }
         LoggerFactory.getLogger().info("结束 -> 发送线程");
+    }
+
+    private void sending() throws Exception {
+        while (true) {
+            T data = queue.take();
+            buffer.clear();
+            encode.encode(data, buffer);
+            buffer.flip();
+            if (!doSend(data.getRemoteAddress(), buffer.array(), 0, buffer.limit())) {
+                LoggerFactory.getLogger().error("数据没有被发送出去！");
+            }
+        }
     }
 
     public boolean send(T data) {
@@ -45,10 +50,14 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
             this.queue.put(data);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger().error("异常 -> 发送线程 LinkedBlockingQueue.put() 异常", e);
         }
         return false;
     }
 
-    protected abstract boolean doSend(SocketAddress address, byte[] buffer, int offset, int length);
+    public void stop(){
+        isSend = false;
+    }
+
+    protected abstract boolean doSend(SocketAddress remoteAddress, byte[] buffer, int offset, int length);
 }

@@ -10,7 +10,6 @@ import com.dream.socket.runnable.UDPSocketSendRunnable;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 public class DreamUDPSocket extends DreamSocket {
@@ -69,6 +68,13 @@ public class DreamUDPSocket extends DreamSocket {
 
     @Override
     public boolean onStop() {
+        if (mHandleRunnable != null) {
+            mHandleRunnable.stop();
+            mHandleRunnable.status(Status.STATUS_DISCONNECT);
+        }
+        if (mSocketSendRunnable != null) {
+            mSocketSendRunnable.stop();
+        }
         if (mSocket != null) {
             LoggerFactory.getLogger().info("关闭UDP管道");
             mSocket.close();
@@ -92,7 +98,7 @@ public class DreamUDPSocket extends DreamSocket {
 
     public boolean send(SocketAddress address, Message data) {
         if (mSocketSendRunnable != null) {
-            data.mAddress = address;
+            data.setRemoteAddress(address);
             mSocketSendRunnable.send(data);
             return true;
         }

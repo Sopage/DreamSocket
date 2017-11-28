@@ -11,6 +11,7 @@ public class HandleRunnable<T extends Message> implements Runnable {
 
     private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private MessageHandle<T> handle;
+    private boolean isHandle = false;
 
     public HandleRunnable(MessageHandle<T> handle) {
         this.handle = handle;
@@ -18,22 +19,26 @@ public class HandleRunnable<T extends Message> implements Runnable {
 
     @Override
     public void run() {
-        synchronized (this) {
-            queue.clear();
-            LoggerFactory.getLogger().info("开启 -> 接收线程");
+        LoggerFactory.getLogger().info("开启 -> 接收线程");
+        handle.onStatus(Status.STATUS_CONNECTED);
+        isHandle = true;
+        while (isHandle) {
             try {
-                handle.onStatus(Status.STATUS_CONNECTED);
-                while (true) {
-                    T data = queue.take();
-                    if (handle != null) {
-                        handle.onMessage(data);
-                    }
-                }
+                handing();
             } catch (Exception e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("异常 -> 接收线程异常退出", e);
             }
         }
         LoggerFactory.getLogger().info("结束 -> 接收线程");
+    }
+
+    private void handing() throws Exception {
+        while (true) {
+            T data = queue.take();
+            if (handle != null) {
+                handle.onMessage(data);
+            }
+        }
     }
 
     public boolean put(T d) {
@@ -41,9 +46,13 @@ public class HandleRunnable<T extends Message> implements Runnable {
             this.queue.put(d);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger().error("异常 -> 接收线程 queue.put() 异常", e);
         }
         return false;
+    }
+
+    public void stop(){
+        isHandle = false;
     }
 
     public void status(int status) {

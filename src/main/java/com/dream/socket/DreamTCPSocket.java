@@ -84,7 +84,7 @@ public class DreamTCPSocket extends DreamSocket {
 
     public <T extends Message> boolean send(T data) {
         if (mSocketSendRunnable != null) {
-            data.mAddress = mAddress;
+            data.setRemoteAddress(mAddress);
             return mSocketSendRunnable.send(data);
         }
         return false;
@@ -92,14 +92,18 @@ public class DreamTCPSocket extends DreamSocket {
 
     @Override
     protected boolean onStop() {
+        if (mHandleRunnable != null) {
+            mHandleRunnable.stop();
+            mHandleRunnable.status(Status.STATUS_DISCONNECT);
+        }
+        if (mSocketSendRunnable != null) {
+            mSocketSendRunnable.stop();
+        }
         if (mSocket != null) {
             shutdownInput(mSocket);
             shutdownOutput(mSocket);
             close(mSocket);
             mSocket = null;
-            if (mHandleRunnable != null) {
-                mHandleRunnable.status(Status.STATUS_DISCONNECT);
-            }
         }
         mSocketSendRunnable = null;
         mHandleRunnable = null;
@@ -120,7 +124,7 @@ public class DreamTCPSocket extends DreamSocket {
                 LoggerFactory.getLogger().info("关闭Socket输入...");
                 socket.shutdownInput();
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("关闭Socket输入异常", e);
             }
         }
     }
@@ -131,18 +135,18 @@ public class DreamTCPSocket extends DreamSocket {
                 LoggerFactory.getLogger().info("关闭Socket输出...");
                 socket.shutdownOutput();
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("关闭Socket输出异常", e);
             }
         }
     }
 
     private static void close(Socket socket) {
-        if (socket != null && !socket.isClosed()) {
+        if (socket != null) {
             try {
                 LoggerFactory.getLogger().info("关闭Socket...");
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger().error("关闭Socket异常", e);
             }
         }
     }
