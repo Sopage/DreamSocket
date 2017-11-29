@@ -3,9 +3,9 @@ package com.dream.socket.codec;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
-public interface MessageCodec {
+public interface MessageCodec<T extends Message> {
 
-    Message decode(SocketAddress address, ByteBuffer buffer);
+    T decode(SocketAddress address, ByteBuffer buffer);
 
-    void encode(Message message, ByteBuffer buffer);
+    void encode(T message, ByteBuffer buffer);
 }

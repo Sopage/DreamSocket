@@ -1,13 +1,13 @@
 package com.dream.socket.codec;
 
-public abstract class MessageHandle {
+public interface MessageHandle<T extends Message> {
 
     /**
      * 连接状态回调
      *
      * @param status 状态
      */
-    public abstract void onStatus(int status);
+    void onStatus(int status);
 
     /**
      * 消息回调
@@ -16,5 +16,5 @@ public abstract class MessageHandle {
      *
      * @param message 消息
      */
-    public abstract void onMessage(Message message);
+    void onMessage(T message);
 }

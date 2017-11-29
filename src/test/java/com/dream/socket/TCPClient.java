@@ -12,9 +12,9 @@ public class TCPClient {
 
     public static void main(String[] args) {
         DreamSocket socket = new DreamTCPSocket("localhost", 6969);
-        socket.codec(new MessageCodec() {
+        socket.codec(new MessageCodec<StringMessage>() {
             @Override
-            public Message decode(SocketAddress address, ByteBuffer buffer) {
+            public StringMessage decode(SocketAddress address, ByteBuffer buffer) {
                 int limit = buffer.limit();
                 if (limit < 4) {
                     return null;
@@ -29,19 +29,19 @@ public class TCPClient {
             }
 
             @Override
-            public void encode(Message message, ByteBuffer buffer) {
+            public void encode(StringMessage message, ByteBuffer buffer) {
 
             }
         });
-        socket.handle(new MessageHandle() {
+        socket.handle(new MessageHandle<StringMessage>() {
             @Override
             public void onStatus(int status) {
 
             }
 
             @Override
-            public void onMessage(Message message) {
-
+            public void onMessage(StringMessage message) {
+                System.out.println(message.getString());
             }
         });
         socket.start();
@@ -50,6 +50,6 @@ public class TCPClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        socket.stop();
+        socket.stop();
     }
 }
