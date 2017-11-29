@@ -1,6 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
-//apply from: 'gradle-mvn-push.gradle'
+apply from: 'gradle-mvn-push.gradle'
 
 repositories {
     mavenCentral()
