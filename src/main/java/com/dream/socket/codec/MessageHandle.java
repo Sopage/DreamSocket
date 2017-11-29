@@ -1,6 +1,6 @@
 package com.dream.socket.codec;
 
-public abstract class MessageHandle<T extends Message> {
+public abstract class MessageHandle {
 
     /**
      * 连接状态回调
@@ -14,7 +14,7 @@ public abstract class MessageHandle<T extends Message> {
      * 解码后的消息会回调onReceive方法
      * 请在这里做业务相关的处理，建议单独开个线程处理
      *
-     * @param data 消息
+     * @param message 消息
      */
-    public abstract void onMessage(T data);
+    public abstract void onMessage(Message message);
 }

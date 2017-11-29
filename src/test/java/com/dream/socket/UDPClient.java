@@ -1,7 +1,7 @@
 package com.dream.socket;
 
-import com.dream.socket.codec.MessageDecode;
-import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.codec.Message;
+import com.dream.socket.codec.MessageCodec;
 import com.dream.socket.codec.MessageHandle;
 
 import java.net.InetSocketAddress;
@@ -12,28 +12,33 @@ public class UDPClient {
 
     public static void main(String[] args) {
         DreamUDPSocket socket = new DreamUDPSocket();
-        socket.codec(new MessageDecode<StringMessage>() {
+        socket.codec(new MessageCodec() {
             @Override
-            protected StringMessage decode(SocketAddress address, ByteBuffer buffer) {
+            public Message decode(SocketAddress address, ByteBuffer buffer) {
                 int limit = buffer.limit();
                 byte[] array = new byte[limit];
                 buffer.get(array);
                 return new StringMessage(array);
             }
-        }, new MessageHandle<StringMessage>() {
+
+            @Override
+            public void encode(Message message, ByteBuffer buffer) {
+                if(message instanceof StringMessage){
+                    buffer.put(((StringMessage) message).getString().getBytes());
+                }
+            }
+        });
+        socket.handle(new MessageHandle() {
             @Override
             public void onStatus(int status) {
 
             }
 
             @Override
-            public void onMessage(StringMessage data) {
-                System.out.println(data.getString());
-            }
-        }, new MessageEncode<StringMessage>() {
-            @Override
-            public void encode(StringMessage data, ByteBuffer buffer) {
-                buffer.put(data.getString().getBytes());
+            public void onMessage(Message message) {
+                if(message instanceof StringMessage){
+                    System.out.println(((StringMessage) message).getString());
+                }
             }
         });
         socket.start();

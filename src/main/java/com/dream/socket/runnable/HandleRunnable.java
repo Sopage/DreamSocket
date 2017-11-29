@@ -7,13 +7,13 @@ import com.dream.socket.logger.LoggerFactory;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class HandleRunnable<T extends Message> implements Runnable {
+public class HandleRunnable implements Runnable {
 
-    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
-    private MessageHandle<T> handle;
+    private LinkedBlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+    private MessageHandle handle;
     private boolean isHandle = false;
 
-    public HandleRunnable(MessageHandle<T> handle) {
+    public HandleRunnable(MessageHandle handle) {
         this.handle = handle;
     }
 
@@ -34,16 +34,16 @@ public class HandleRunnable<T extends Message> implements Runnable {
 
     private void handing() throws Exception {
         while (true) {
-            T data = queue.take();
+            Message message = queue.take();
             if (handle != null) {
-                handle.onMessage(data);
+                handle.onMessage(message);
             }
         }
     }
 
-    public boolean put(T d) {
+    public boolean put(Message message) {
         try {
-            this.queue.put(d);
+            this.queue.put(message);
             return true;
         } catch (Exception e) {
             LoggerFactory.getLogger().error("异常 -> 接收线程 queue.put() 异常", e);

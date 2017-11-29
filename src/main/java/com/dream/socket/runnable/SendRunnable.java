@@ -1,22 +1,22 @@
 package com.dream.socket.runnable;
 
 import com.dream.socket.codec.Message;
-import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.codec.MessageCodec;
 import com.dream.socket.logger.LoggerFactory;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class SendRunnable<T extends Message> implements Runnable {
+public abstract class SendRunnable implements Runnable {
 
-    private MessageEncode<T> encode;
-    private ByteBuffer buffer = ByteBuffer.allocate(102400);
-    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    private MessageCodec mCodec;
+    private ByteBuffer mBuffer = ByteBuffer.allocate(102400);
+    private LinkedBlockingQueue<Message> mQueue = new LinkedBlockingQueue<>();
     private boolean isSend = false;
 
-    public SendRunnable(MessageEncode<T> encode) {
-        this.encode = encode;
+    public SendRunnable(MessageCodec codec) {
+        this.mCodec = codec;
     }
 
     @Override
@@ -35,19 +35,19 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
 
     private void sending() throws Exception {
         while (true) {
-            T data = queue.take();
-            buffer.clear();
-            encode.encode(data, buffer);
-            buffer.flip();
-            if (!doSend(data.getRemoteAddress(), buffer.array(), 0, buffer.limit())) {
+            Message data = mQueue.take();
+            mBuffer.clear();
+            mCodec.encode(data, mBuffer);
+            mBuffer.flip();
+            if (!doSend(data.getRemoteAddress(), mBuffer.array(), 0, mBuffer.limit())) {
                 LoggerFactory.getLogger().error("数据没有被发送出去！");
             }
         }
     }
 
-    public boolean send(T data) {
+    public boolean send(Message data) {
         try {
-            this.queue.put(data);
+            this.mQueue.put(data);
             return true;
         } catch (Exception e) {
             LoggerFactory.getLogger().error("异常 -> 发送线程 LinkedBlockingQueue.put() 异常", e);
@@ -55,7 +55,7 @@ public abstract class SendRunnable<T extends Message> implements Runnable {
         return false;
     }
 
-    public void stop(){
+    public void stop() {
         isSend = false;
     }
 

@@ -1,30 +1,26 @@
 package com.dream.socket.runnable;
 
-import com.dream.socket.codec.Message;
-import com.dream.socket.codec.MessageEncode;
+import com.dream.socket.codec.MessageCodec;
 import com.dream.socket.logger.LoggerFactory;
 
 import java.io.OutputStream;
 import java.net.SocketAddress;
 
-public final class TCPSocketSendRunnable<T extends Message> extends SendRunnable<T> {
+public final class TCPSocketSendRunnable extends SendRunnable {
 
-    private OutputStream out;
+    private OutputStream mOutputStream;
 
-    public TCPSocketSendRunnable(MessageEncode<T> encode) {
-        super(encode);
-    }
-
-    public void setOutputStream(OutputStream out) {
-        this.out = out;
+    public TCPSocketSendRunnable(MessageCodec codec, OutputStream out) {
+        super(codec);
+        this.mOutputStream = out;
     }
 
     @Override
     protected boolean doSend(SocketAddress address, byte[] buffer, int offset, int length) {
-        if (out != null) {
+        if (mOutputStream != null) {
             try {
-                out.write(buffer, offset, length);
-                out.flush();
+                mOutputStream.write(buffer, offset, length);
+                mOutputStream.flush();
                 return true;
             } catch (Exception e) {
                 LoggerFactory.getLogger().error("数据发送异常！", e);

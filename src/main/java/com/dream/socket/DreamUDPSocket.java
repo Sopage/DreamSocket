@@ -1,11 +1,8 @@
 package com.dream.socket;
 
 import com.dream.socket.codec.Message;
-import com.dream.socket.codec.MessageDecode;
-import com.dream.socket.codec.MessageEncode;
-import com.dream.socket.codec.MessageHandle;
 import com.dream.socket.logger.LoggerFactory;
-import com.dream.socket.runnable.HandleRunnable;
+import com.dream.socket.runnable.SendRunnable;
 import com.dream.socket.runnable.UDPSocketSendRunnable;
 
 import java.net.DatagramPacket;
@@ -15,30 +12,23 @@ import java.net.SocketAddress;
 public class DreamUDPSocket extends DreamSocket {
 
     private DatagramSocket mSocket;
-    private UDPSocketSendRunnable mSocketSendRunnable;
-    private MessageDecode mMessageDecode;
-    private HandleRunnable mHandleRunnable;
-
-    public <T extends Message> void codec(MessageDecode<T> messageDecode, MessageHandle<T> messageHandle, MessageEncode<T> messageEncode) {
-        this.mHandleRunnable = new HandleRunnable<>(messageHandle);
-        messageDecode.setHandleRunnable(mHandleRunnable);
-        this.mMessageDecode = messageDecode;
-        this.mSocketSendRunnable = new UDPSocketSendRunnable<>(messageEncode);
-    }
+    private SendRunnable mSendRunnable;
 
     @Override
-    public boolean onStart() {
+    public void onStart() {
         synchronized (this) {
             try {
                 LoggerFactory.getLogger().info("开始创建UDP管道");
                 mSocket = new DatagramSocket();
             } catch (Exception e) {
                 LoggerFactory.getLogger().error("UDP管道创建失败！", e);
-                return false;
+                return;
             }
-            mSocketSendRunnable.setDatagramSocket(mSocket);
-            executeRunnable(mSocketSendRunnable);
-            executeRunnable(mHandleRunnable);
+            if (mSendRunnable == null) {
+                mSendRunnable = new UDPSocketSendRunnable(mMessageCodec, mSocket);
+            }
+            startRunnable(mSendRunnable);
+            startRunnable(mHandleRunnable);
             byte[] buffer = new byte[500];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try {
@@ -63,17 +53,16 @@ public class DreamUDPSocket extends DreamSocket {
             }
 
         }
-        return false;
     }
 
     @Override
-    public boolean onStop() {
+    public void onStop() {
         if (mHandleRunnable != null) {
             mHandleRunnable.stop();
             mHandleRunnable.status(Status.STATUS_DISCONNECT);
         }
-        if (mSocketSendRunnable != null) {
-            mSocketSendRunnable.stop();
+        if (mSendRunnable != null) {
+            mSendRunnable.stop();
         }
         if (mSocket != null) {
             LoggerFactory.getLogger().info("关闭UDP管道");
@@ -83,9 +72,8 @@ public class DreamUDPSocket extends DreamSocket {
                 mHandleRunnable.status(Status.STATUS_DISCONNECT);
             }
         }
-        mSocketSendRunnable = null;
+        mSendRunnable = null;
         mHandleRunnable = null;
-        return true;
     }
 
     @Override
@@ -97,9 +85,9 @@ public class DreamUDPSocket extends DreamSocket {
     }
 
     public boolean send(SocketAddress address, Message data) {
-        if (mSocketSendRunnable != null) {
+        if (mSendRunnable != null) {
             data.setRemoteAddress(address);
-            mSocketSendRunnable.send(data);
+            mSendRunnable.send(data);
             return true;
         }
         return false;
