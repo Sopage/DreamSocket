@@ -78,13 +78,17 @@ public abstract class DreamSocket {
         this.mHandleRunnable = new HandleRunnable(handle);
     }
 
+    public abstract boolean send(Message message);
+
+    public abstract boolean send(SocketAddress address, Message message);
+
     protected abstract void onStart();
 
     protected abstract void onStop();
 
     public abstract boolean isConnected();
 
-    private class StartRunnable implements Runnable {
+    private final class StartRunnable implements Runnable {
 
         @Override
         public void run() {
@@ -92,7 +96,7 @@ public abstract class DreamSocket {
         }
     }
 
-    public boolean isRunning() {
+    public final boolean isRunning() {
         return this.running;
     }
 

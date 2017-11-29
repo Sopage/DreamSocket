@@ -84,11 +84,19 @@ public class DreamUDPSocket extends DreamSocket {
         return false;
     }
 
-    public boolean send(SocketAddress address, Message data) {
-        if (mSendRunnable != null) {
-            data.setRemoteAddress(address);
-            mSendRunnable.send(data);
-            return true;
+    @Override
+    public boolean send(Message message) {
+        if (mSendRunnable != null && message.getRemoteAddress() != null) {
+            return mSendRunnable.send(message);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean send(SocketAddress address, Message message) {
+        if (message != null) {
+            message.setRemoteAddress(address);
+            return send(message);
         }
         return false;
     }

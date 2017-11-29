@@ -71,10 +71,19 @@ public class DreamTCPSocket extends DreamSocket {
         }
     }
 
-    public boolean send(Message data) {
+    @Override
+    public boolean send(Message message) {
         if (mSendRunnable != null) {
-            data.setRemoteAddress(mAddress);
-            return mSendRunnable.send(data);
+            message.setRemoteAddress(mAddress);
+            return mSendRunnable.send(message);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean send(SocketAddress address, Message message) {
+        if (message != null) {
+            return send(message);
         }
         return false;
     }

@@ -35,19 +35,19 @@ public abstract class SendRunnable implements Runnable {
 
     private void sending() throws Exception {
         while (true) {
-            Message data = mQueue.take();
+            Message message = mQueue.take();
             mBuffer.clear();
-            mCodec.encode(data, mBuffer);
+            mCodec.encode(message, mBuffer);
             mBuffer.flip();
-            if (!doSend(data.getRemoteAddress(), mBuffer.array(), 0, mBuffer.limit())) {
+            if (!doSend(message.getRemoteAddress(), mBuffer.array(), 0, mBuffer.limit())) {
                 LoggerFactory.getLogger().error("数据没有被发送出去！");
             }
         }
     }
 
-    public boolean send(Message data) {
+    public boolean send(Message message) {
         try {
-            this.mQueue.put(data);
+            this.mQueue.put(message);
             return true;
         } catch (Exception e) {
             LoggerFactory.getLogger().error("异常 -> 发送线程 LinkedBlockingQueue.put() 异常", e);

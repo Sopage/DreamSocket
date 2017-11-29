@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class UDPClient {
 
     public static void main(String[] args) {
-        DreamUDPSocket socket = new DreamUDPSocket();
+        DreamSocket socket = new DreamUDPSocket();
         socket.codec(new MessageCodec() {
             @Override
             public Message decode(SocketAddress address, ByteBuffer buffer) {
@@ -23,7 +23,7 @@ public class UDPClient {
 
             @Override
             public void encode(Message message, ByteBuffer buffer) {
-                if(message instanceof StringMessage){
+                if (message instanceof StringMessage) {
                     buffer.put(((StringMessage) message).getString().getBytes());
                 }
             }
@@ -36,7 +36,7 @@ public class UDPClient {
 
             @Override
             public void onMessage(Message message) {
-                if(message instanceof StringMessage){
+                if (message instanceof StringMessage) {
                     System.out.println(((StringMessage) message).getString());
                 }
             }

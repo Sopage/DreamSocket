@@ -11,7 +11,7 @@ public class TCPClient {
 
 
     public static void main(String[] args) {
-        DreamTCPSocket socket = new DreamTCPSocket("localhost", 6969);
+        DreamSocket socket = new DreamTCPSocket("localhost", 6969);
         socket.codec(new MessageCodec() {
             @Override
             public Message decode(SocketAddress address, ByteBuffer buffer) {
