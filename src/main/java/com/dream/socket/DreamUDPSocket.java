@@ -73,7 +73,6 @@ public class DreamUDPSocket extends DreamSocket {
             }
         }
         mSendRunnable = null;
-        mHandleRunnable = null;
     }
 
     @Override

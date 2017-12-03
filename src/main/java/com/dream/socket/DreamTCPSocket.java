@@ -104,7 +104,6 @@ public class DreamTCPSocket extends DreamSocket {
             mSocket = null;
         }
         mSendRunnable = null;
-        mHandleRunnable = null;
     }
 
     @Override
