@@ -4,14 +4,14 @@ Socket连接客户端，精简版本的Netty或者Mina
 
 Gradle
 
-    compile 'com.github.spacetimeme:dream-socket:3.0.0-SNAPSHOT'
+    compile 'com.github.spacetimeme:dream-socket:3.0.0'
     
 Maven
 
     <dependency>
       <groupId>com.github.spacetimeme</groupId>
       <artifactId>dream-socket</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
     </dependency>
     
 [TCP Server](https://github.com/spacetimeme/DreamSocket/blob/develop/src/test/java/com/dream/socket/TCPServer.java)
